@@ -1,0 +1,451 @@
+# robot arm pick and place movement show 6 rounds to 3 places
+
+
+
+
+
+# 필요한 라이브러리 임포트
+import socket # 로봇 스크립트 명령 전송을 위한 소켓 통신
+import rbpodo as rb # 레인보우 로보틱스 코봇 제어 라이브러리
+import numpy as np # 수치 계산 (배열 등)
+import time # 시간 지연 사용
+
+# ======= 설정 부분 =======
+ROBOT_IP = "192.168.0.22" # 로봇 제어기의 실제 IP 주소로 변경하세요. (예: "10.0.2.7" 등)
+SOCKET_PORT = 5000
+# =======================
+
+print(f"로봇에 연결 중... IP: {ROBOT_IP}")
+robot = rb.Cobot(ROBOT_IP)
+rc = rb.ResponseCollector()
+print("로봇 연결 성공.")
+
+# 작동 모드 설정 (스크립트 시작 시 한 번 실행)
+# 로봇을 실제로 움직입니다! 주변 안전 확인 필수!
+print("작동 모드를 Real으로 설정합니다. (로봇이 실제 움직입니다!)")
+robot.set_operation_mode(rc, rb.OperationMode.Real)
+
+# 전체 이동 속도 오버라이드 설정 (0.0 ~ 1.0) (스크립트 시작 시 한 번 실행)
+# 실제 움직일 때는 낮은 값(예: 0.1 ~ 0.3)으로 시작하는 것이 안전합니다.
+speed_override = 1
+print(f"전체 속도 오버라이드 설정: {speed_override*100:.0f}%")
+robot.set_speed_bar(rc, speed_override)
+#rc.error().throw_if_not_empty() # 에러 발생 시 스크립트 즉시 중단
+
+try:
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.connect((ROBOT_IP, SOCKET_PORT))
+    print(f"로봇 스크립트 서버에 소켓 연결되었습니다. IP: {ROBOT_IP}, Port: {SOCKET_PORT}")
+except socket.error as e:
+    print(f"로봇 스크립트 서버 소켓 연결 실패: {e}")
+    print("move_l_relative 함수는 작동하지 않습니다.")
+    client_socket = None # 연결 실패 시 None으로 설정
+
+# 소켓을 통해 로봇 스크립트 명령 전송 함수
+def send_command(command):
+    """
+    로봇 스크립트 명령어를 소켓을 통해 전송하고 응답을 받습니다.
+    """
+    if client_socket is None:
+        print("소켓 연결이 활성화되지 않아 명령을 보낼 수 없습니다.")
+        return "Error: Socket not connected"
+        
+    try:
+        client_socket.sendall(command.encode())
+        # TODO: 로봇 응답 크기를 정확히 확인하고 필요하다면 반복 수신
+        # 현재는 최대 1024 바이트만 수신합니다.
+        response = client_socket.recv(1024).decode()
+        # print(f"Sent: {command.strip()}, Recv: {response.strip()}") # 디버깅용
+        return response
+    except socket.error as e:
+        print(f"명령 전송/수신 중 소켓 오류 발생: {e}")
+        #raise # 필요하다면 예외를 다시 발생
+        return "Error: Socket communication failed"
+
+# 로봇 스크립트 명령 실행 완료 대기 함수 (모션 변경 감지)
+def wait_for_motion(timeout=10.0):
+    """
+    로봇의 모션 상태 변경 메시지를 수신할 때까지 대기합니다.
+    
+    Args:
+        timeout (float): 대기할 최대 시간 (초).
+    Returns:
+        bool: 모션 변경 메시지를 감지했으면 True, 타임아웃되면 False.
+    """
+    if client_socket is None:
+        print("소켓 연결이 활성화되지 않아 모션 완료를 대기할 수 없습니다.")
+        return False
+
+    print("[wait_for_motion] 로봇 모션 완료 대기...")
+    # 소켓 수신에 타임아웃 설정 (무한 대기 방지)
+    client_socket.settimeout(timeout)
+    start_time = time.time()
+
+    try:
+        # TODO: 더 견고한 파싱 로직 필요. 현재는 문자열 포함 여부만 확인.
+        while time.time() - start_time < timeout:
+            data = client_socket.recv(1024).decode()
+            if "info[motion_changed][0]" in data:
+                #print("[wait_for_motion] 모션 변경 감지.") # 디버깅용
+                client_socket.settimeout(None) # 타임아웃 설정 해제
+                return True
+            # print(f"[wait_for_motion] 수신 데이터: {data.strip()}") # 디버깅용
+        
+        print(f"[wait_for_motion] 타임아웃 ({timeout}s)으로 모션 변경 감지 실패.")
+        client_socket.settimeout(None) # 타임아웃 설정 해제
+        return False # 타임아웃
+
+    except socket.timeout:
+        print(f"[wait_for_motion] 소켓 수신 타임아웃 ({timeout}s).")
+        client_socket.settimeout(None) # 타임아웃 설정 해제
+        return False
+    except socket.error as e:
+        print(f"[wait_for_motion] 수신 중 소켓 오류 발생: {e}")
+        client_socket.settimeout(None) # 타임아웃 설정 해제
+        #raise # 필요하다면 예외 다시 발생
+        return False
+
+# move j함수 - 관절 이동 함수
+def mmove_j(angles_j, speed_j, acceleration_j):
+    """
+    로봇을 목표 관절 각도로 이동시키는 함수.
+
+    Args:
+        angles_j (np.array): 목표 관절 각도 리스트 (6개 요소, 도 단위).
+        speed_j (float): 이동 속도 (deg/s).
+        acceleration_j (float): 가속도 (deg/s^2).
+    Raises:
+        Exception: 로봇 명령 실행 중 오류 발생 시.
+    """
+    print(f"\n--- [mmove_j] 로봇을 목표 관절 위치로 이동 ---")
+    print(f"  목표 각도: {angles_j}")
+    print(f"  속도: {speed_j} deg/s, 가속도: {acceleration_j} deg/s^2")
+
+    try:
+        # 관절 공간 이동 명령 전송
+        robot.move_j(rc, angles_j, speed_j, acceleration_j)
+
+        # 명령 버퍼 플러시 및 에러 확인
+        # move_j 명령은 버퍼에 담길 수 있으므로 플러시하여 즉시 전송
+        robot.flush(rc)
+        rc.error().throw_if_not_empty()
+        rc.clear() # 응답 수집기 초기화
+
+        # 이동 시작 및 완료 대기
+        print("  로봇 이동 시작 대기...")
+        # 로봇이 움직이기 시작할 때까지 대기 (타임아웃 설정)
+        if robot.wait_for_move_started(rc, 5.0).is_success(): # 5초 안에 시작 안 하면 실패
+            print("  로봇 이동 시작 감지.")
+            print("  로봇 이동 완료 대기...")
+            # 로봇이 움직임을 마칠 때까지 대기
+            robot.wait_for_move_finished(rc)
+            print("--- [mmove_j] 로봇 이동 완료 ---")
+        else:
+            print("--- [mmove_j] 로봇 이동 시작 실패 또는 타임아웃 ---")
+            rc.error().throw_if_not_empty() # 이동 시작 실패 시 에러 확인 (raise 발생)
+
+    except Exception as e:
+        print(f"--- [mmove_j] 이동 중 오류 발생: {e} ---")
+        raise # 예외를 다시 발생시켜 호출자에서 처리하도록 함
+
+# 직교 공간 상대 직선 이동 함수 (로봇 스크립트 move_l_rel 사용)
+def mmove_l_relative(displacement_vector, speed_l, acceleration_l, coordinate_system_index):
+    """
+    로봇 TCP를 현재 위치에서 지정된 좌표계 기준으로 상대 직선 이동시키는 함수.
+    로봇 스크립트 명령어 move_l_rel을 소켓 통신으로 전송합니다.
+
+    Args:
+        displacement_vector (list or np.array): 상대 이동 변위 [dx, dy, dz, drx, dry, drz] (mm, degree 단위).
+        speed_l (float): 이동 속도 (mm/s).
+        acceleration_l (float): 가속도 (mm/s^2).
+        coordinate_system_index (int): 상대 이동의 기준이 될 좌표계 인덱스 (예: 0: Base, 1: Tool, 2: User 0... 등).
+                                       로봇 매뉴얼에서 move_l_rel 명령어 설명을 반드시 확인하세요.
+    Raises:
+        Exception: 명령 전송 또는 실행 중 오류 발생 시 (소켓 오류 포함).
+    """
+    print(f"\n--- [mmove_l_relative] 로봇 TCP 상대 이동 ---")
+    print(f"  변위: {displacement_vector}")
+    print(f"  기준 좌표계 인덱스: {coordinate_system_index}")
+    print(f"  속도: {speed_l} mm/s, 가속도: {acceleration_l} mm/s^2")
+
+    try:
+        # 스크립트 명령어 형식으로 변위 벡터 문자열 생성
+        disp_str = ", ".join(map(str, displacement_vector))
+        command = f'move_l_rel(pnt[{disp_str}], {speed_l}, {acceleration_l}, {coordinate_system_index})'
+
+        # 로봇 스크립트 인터페이스로 명령 전송 (소켓 통신)
+        response = send_command(command)
+        print(f"  Command sent: {command}")
+        print(f"  Response: {response.strip()}") # 로봇 응답 확인 (성공/실패 등)
+
+        # TODO: 로봇 응답(response)을 분석하여 명령이 성공적으로 받아들여졌는지 확인하는 로직 추가
+        # send_command의 응답은 명령 수신 확인일 수 있으며, 실제 실행 성공을 의미하지 않을 수 있습니다.
+
+        # 이동 완료 대기 (소켓 통신으로 모션 완료 메시지 감지)
+        if not wait_for_motion():
+             # 타임아웃 등으로 모션 완료 감지 실패 시
+             print("--- [mmove_l_relative] 모션 완료 감지 실패 또는 타임아웃 ---")
+             # 필요하다면 여기서 에러 처리 또는 예외 발생
+             # raise Exception("Motion completion not detected") # 예: 강제 예외 발생
+
+        print("--- [mmove_l_relative] 로봇 상대 이동 완료 ---")
+
+    except Exception as e:
+        print(f"--- [mmove_l_relative] 상대 이동 중 오류 발생: {e} ---")
+        # 소켓 통신 에러, send_command/wait_for_motion 에러 등을 포함
+        raise # 예외를 다시 발생시켜 호출자에서 처리하도록 함
+
+# 시작 위치 6개 관절 각도
+pose_initiate = np.array([-135.0, 0.0, 90.0, 0.0, 90.0, 45.0])
+
+pose_desk = {}
+current_p = {}
+current_p[(0)] = 0
+current_p[(1)] = 0
+
+pose_desk[(0, 1)] = np.array([-166.67, 37.03, 94.11, -41.15, 89.96, 76.46])  # 1번 데스크 1번 위치
+pose_desk[(0, 2)] = np.array([-138.44, 51.74, 65.89, -27.64, 89.96, 48.44])  # 1번 데스크 2번 위치
+pose_desk[(0, 3)] = np.array([-88.57, 15.13, 131.94, -57.08, 89.96, -1.42])  # 1번 데스크 3번 위치
+pose_desk[(0, 4)] = np.array([-162.40, 25.28, 122.86, -58.15, 89.97, 72.86]) # 1번 데스크 4번 위치
+pose_desk[(0, 5)] = np.array([-129.54, 37.06, 94.07, -41.13, 89.96, 39.54])  # 1번 데스크 5번 위치
+pose_desk[(0, 6)] = np.array([-129.62, 35.99, 94.12, -40.11, 89.96, 39.62])  # 1번 데스크 6번 위치
+
+relative_coord_system_index = 2 #로컬 리니어 이동할 축(로봇내 z축이 2번이라서 설정해둡니다.)
+relative_move_speed = 500 # 상대 이동 속도 (mm/s)
+relative_move_acceleration = 500 # 상대 이동 가속도 (mm/s^2)
+md_distance = 50.0 # 하강거리
+
+def initiate_pose_set():
+    # ======= 1. 초기 관절 위치로 이동 =======
+    initial_angles_j = pose_initiate
+    move_j_speed_init = 30 # 초기 이동 속도
+    move_j_acceleration_init = 30 # 초기 이동 가속도
+    mmove_j(initial_angles_j, move_j_speed_init, move_j_acceleration_init)
+    return
+
+def cycle_2():
+
+    move_j_speed_init = 150 # 초기 이동 속도
+    move_j_acceleration_init = 150 # 초기 이동 가속도
+
+    grip("release") # 그리퍼 놓고 시작
+
+    initial_angles_j = pose_desk[(0, 6)] # 6번 데스크
+    mmove_j(initial_angles_j, move_j_speed_init, move_j_acceleration_init)
+
+
+    sameplates = 0
+
+    for i in range(6):
+
+        sameplates += 1
+
+        unitmove_lll(1, sameplates) # 1번데스크의 sameplates 위치의 근처 상공으로 이동 (1~6)
+    
+    sameplates = 0
+
+    for i in range(6):
+
+        sameplates += 1
+
+        unitmove_lll(2, sameplates) # 1번데스크의 sameplates 위치의 근처 상공으로 이동 (1~6)
+
+    sameplates = 0
+
+    for i in range(6):
+
+        sameplates += 1
+
+        unitmove_lll(3, sameplates) # 1번데스크의 sameplates 위치의 근처 상공으로 이동 (1~6)
+
+
+    asd
+
+    while True:
+
+        # 1번 데스크의 n번 홀에서 2번 데스크로 n번 홀로 이동하는 반복문
+
+        sameplates = 0
+
+        for i in range(6):
+
+            sameplates += 1
+
+            unitmove_lll(1, sameplates) # 1번데스크의 sameplates 위치의 근처 상공으로 이동 (1~6)
+            gog("down") # 하강
+            grip("grab") # 집기
+            gog("up") # 상승
+
+            unitmove_lll(2, sameplates) # 2번데스크의 sameplates 위치의 근처 상공으로 이동 (1~6)
+            gog("down") # 하강
+            grip("release") # 놓기
+            gog("up") # 상승
+
+        #==============================
+
+        # 3 -> 1 데스크
+
+        sameplates = 0
+
+        for i in range(6):
+
+            sameplates += 1
+
+            unitmove_lll(3, sameplates)
+            gog("down")
+            grip("grab")
+            gog("up")
+
+            unitmove_lll(1, sameplates)
+            gog("down")
+            grip("release")
+            gog("up")
+
+        #==============================
+
+        # 2 -> 3 데스크
+
+        sameplates = 0
+
+        for i in range(6):
+
+            sameplates += 1
+
+            unitmove_lll(2, sameplates)
+            gog("down")
+            grip("grab")
+            gog("up")
+
+            unitmove_lll(3, sameplates)
+            gog("down")
+            grip("release")
+            gog("up")
+
+
+        return
+
+
+# 그리퍼 동작 함수
+def grip(ord):
+
+    # 공압 그리퍼 동작을 위한 코드 컨트롤 박스의 0번을 현재 상태(0) -> 1 -> 0으로 신호를 변경하면
+    # 솔레노이드가 동작후 원상태로 복귀함 -> 공압 밸브를 옮김
+    # 놓으려면 1번 포트의 신호를 현재 상태(0) -> 1 -> 0 으로 다시 변경
+
+
+    if(ord == "release"):
+        robot.set_dout_bit_combination(rc, 0, 3, 1, rb.Endian.LittleEndian)
+        time.sleep(0.1)
+        robot.set_dout_bit_combination(rc, 0, 3, 0, rb.Endian.LittleEndian)
+
+
+    elif(ord == "grab"):
+        robot.set_dout_bit_combination(rc, 0, 3, 2, rb.Endian.LittleEndian)
+        time.sleep(0.1)
+        robot.set_dout_bit_combination(rc, 0, 3, 0, rb.Endian.LittleEndian)
+        
+    else:
+        return
+
+# 목적물 상공에서 하강 상승 하는 코드
+def gog(oord):
+        # 목적물 상공에 도착시 아래로 내려가거나 올라가는 동작을 위한 코드
+
+        # relative_move_speed = 400 # 상대 이동 속도 (mm/s)
+        # relative_move_acceleration = 400 # 상대 이동 가속도 (mm/s^2)
+
+        if(oord == "down"):
+            relative_displacement_down_10cm = [0.0, 0.0, -md_distance, 0.0, 0.0, 0.0]
+            mmove_l_relative(relative_displacement_down_10cm, relative_move_speed, relative_move_acceleration, relative_coord_system_index)
+
+        elif(oord == "up"):
+            relative_displacement_down_10cm = [0.0, 0.0, md_distance, 0.0, 0.0, 0.0]
+            mmove_l_relative(relative_displacement_down_10cm, relative_move_speed, relative_move_acceleration, relative_coord_system_index)
+
+        return
+
+def unitmove_lll(table, area):
+        # table = 테이블 1~3
+        # area = 위치 1~6
+
+        # 테이블의 1번 홀 위치가 될 변수
+        target_x = 0.0
+        target_y = 0.0
+
+        # 각 테이블의 중심을 기준으로 2번 테이블 1번 홀에서
+        # 1번 테이블 1번 홀은 x축으로 565mm 만큼 떨어져 있음
+        # 3번 테이블 1번 홀은 y축으로 475mm 만큼 떨어져 있음
+        offset_x = 565
+        offset_y = 475
+
+        # 만약 테이블 1번이 호출되면 앞으로 로봇팔이 이동할 위치가 현재 테이블보다 오프셋이 떨어진 만큼 옮기게 변수 조정
+        if (table == 1):
+            target_x += offset_x
+
+        elif(table == 2):
+            None
+
+        elif(table == 3):
+            target_y += offset_y
+
+        else:
+            None
+
+
+        # 1번 홀에서 6번 홀간 이동거리 오프셋, 한칸당은 80mm, 2칸 이동은 160mm 좌우 방향 선정은 -로
+        nextstep = -80
+        nextstep_2 = -160
+
+        # 만약 
+        if (area == 2):
+            target_x += nextstep
+
+        elif(area == 3):
+            target_x += nextstep_2
+
+        elif(area == 4):
+            target_y += nextstep
+
+        elif(area == 5):
+            target_y += nextstep
+            target_x += nextstep
+
+        elif(area == 6):
+            target_y += nextstep
+            target_x += nextstep_2
+        
+        else:
+            None
+
+        # 이전의 저장된 현재 위치 상태를 불러온뒤
+        # 목적지의 위치를 뺌
+        # 이러면 나머지 거리간 이동이 나옴
+        # 이 거리만큼 이동
+        # 이후 현재 상태 저장
+
+        move_x = target_x - current_p[(0)]
+        move_y = target_y - current_p[(1)]
+
+        relative_displacement_down_10cm = [move_x, move_y, 0.0, 0.0, 0.0, 0.0]
+        mmove_l_relative(relative_displacement_down_10cm, relative_move_speed, relative_move_acceleration, relative_coord_system_index)
+
+        current_p[(0)] = target_x
+        current_p[(1)] = target_y
+
+        return
+
+
+# 메인 실행 로직
+def main():
+
+    initiate_pose_set()
+
+    aa
+
+    print("=== 로봇 이동 스크립트 시작 ===")
+
+    cycle_2()
+    
+if __name__ == "__main__":
+    main()
+
