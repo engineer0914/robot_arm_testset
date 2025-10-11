@@ -1,0 +1,62 @@
+[33mcommit e835cbc25884beaf571e9fc87b7009a9a3186bb9[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mttemp[m[33m)[m
+Author: engineer0914 <dsp_robotics@inu.ac.kr>
+Date:   Sun Oct 12 00:08:07 2025 +0900
+
+    새 파일을 하나 추가 해봤습니다.
+
+[33mcommit cb084127cdad3403307f3a81ec825002f1da80a7[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m
+Merge: c01cd1f 60840cf
+Author: dsp_robotics <75717886+engineer0914@users.noreply.github.com>
+Date:   Sat Oct 11 22:44:09 2025 +0900
+
+    Merge pull request #3 from engineer0914/ttemp
+    
+    gitignore 수정하고, test 용으로 fakememo를 두었습니다. 이제 제대로 동작한다면 test와 fakememo…
+
+[33mcommit 60840cf6305d26433ab4e65d6189d394bb485c09[m
+Author: engineer0914 <dsp_robotics@inu.ac.kr>
+Date:   Sat Oct 11 22:43:31 2025 +0900
+
+    gitignore 수정하고, test 용으로 fakememo를 두었습니다. 이제 제대로 동작한다면 test와 fakememo가 올라가지 않을겁니다.
+
+[33mcommit c01cd1fe27b653f0c5699e1d430fe4b14361f0c1[m
+Author: dsp_robotics <75717886+engineer0914@users.noreply.github.com>
+Date:   Sat Oct 11 22:31:23 2025 +0900
+
+    Delete test.py
+
+[33mcommit ec0538bf1d95e40e855f03b008f121fee728e89c[m
+Merge: 4a720c3 dcdfea0
+Author: dsp_robotics <75717886+engineer0914@users.noreply.github.com>
+Date:   Sat Oct 11 22:28:42 2025 +0900
+
+    Merge pull request #2 from engineer0914/temp
+    
+    gitignore 수정
+
+[33mcommit dcdfea03bbbe4da0b8e18aef709cf67822b9c78d[m
+Author: engineer0914 <dsp_robotics@inu.ac.kr>
+Date:   Sat Oct 11 22:27:54 2025 +0900
+
+    gitignore 수정
+
+[33mcommit 4a720c3c9c2db1460b0df8865c1c7de22336cf59[m
+Merge: 339720c 3fba01b
+Author: dsp_robotics <75717886+engineer0914@users.noreply.github.com>
+Date:   Sat Oct 11 22:19:56 2025 +0900
+
+    Merge pull request #1 from engineer0914/feature/test
+    
+    티칭모드 코드를 추가했습니다. 근데 동작 안합니다. git ignore 파일을 추가했습니다. test 파일은 연습장이었습니다.
+
+[33mcommit 3fba01bfbed468b7c66b0322f67a05f4de0f44e3[m
+Author: engineer0914 <dsp_robotics@inu.ac.kr>
+Date:   Sat Oct 11 22:18:36 2025 +0900
+
+    티칭모드 코드를 추가했습니다. 근데 동작 안합니다. git ignore 파일을 추가했습니다. test 파일은 연습장이었습니다.
+
+[33mcommit 339720c26b7c2872c18b26cc08a6543231a197b0[m
+Author: engineer0914 <dsp_robotics@inu.ac.kr>
+Date:   Fri Oct 10 01:21:33 2025 +0900
+
+    robotarm test code set. ip set in txt file, robot arm should be connected with locally
