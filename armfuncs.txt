@@ -1,0 +1,2781 @@
+
+'BlendingOption', 
+
+'Cobot', 
+
+'CobotData', 
+
+'CollisionFollowUpMode', 
+
+'CollisionMode', 
+
+'ControlBoxInfo', 
+
+'DigitalIOMode', 
+
+'Endian', 
+
+'ErrorCodeMessage', 
+
+'GripperConnectionPoint', 
+
+'GripperModel', 
+
+'Message', 
+
+'MoveCOrientationOption', 
+
+'MoveCRotationOption', 
+
+'MoveITPLOption', 
+
+'MoveLBOption', 
+
+'MoveLCOption', 
+
+'MoveLCProperty', 
+
+'MovePBOption', 
+
+'MoveServoTOption', 
+
+'OperationMode', 
+
+'ReferenceFrame', 
+
+'Response', 
+
+'ResponseCollector', 
+
+'ReturnType', 
+
+'RobotState', 
+
+'SystemState', 
+
+'SystemVariable', 
+
+'asyncio', 
+
+'to_string'
+
+
+
+
+
+
+
+
+
+
+from __future__ import annotations
+import collections.abc
+import numpy
+import numpy.typing
+import typing
+from . import asyncio
+__all__ = ['BlendingOption', 'Cobot', 'CobotData', 'CollisionFollowUpMode', 'CollisionMode', 'ControlBoxInfo', 'DigitalIOMode', 'Endian', 'ErrorCodeMessage', 'GripperConnectionPoint', 'GripperModel', 'ICE_INFO_AMBI_HIGH', 'ICE_INFO_AMBI_LOW', 'ICE_INFO_CONNECTED', 'ICE_INFO_MODE_COMM', 'ICE_INFO_MODE_CUP', 'ICE_INFO_REQUESTING', 'ICE_INFO_TIME_ICE', 'ICE_INFO_TIME_WATER', 'ICE_INFO_TMEP_AMBI', 'ICE_INFO_TMEP_CONDEN', 'ICE_INFO_TMEP_EVAPO', 'ICE_INFO_USING', 'ICE_INFO_VECSIZE', 'ICE_STATE_COMM_MODE', 'ICE_STATE_COMP_WORK', 'ICE_STATE_CUP_LEVEL', 'ICE_STATE_ERR_1', 'ICE_STATE_ERR_2', 'ICE_STATE_ERR_3', 'ICE_STATE_ERR_4', 'ICE_STATE_ERR_CODE', 'ICE_STATE_FULL_ICE', 'ICE_STATE_LAST_ICE_NO', 'ICE_STATE_LAST_ICE_YES', 'ICE_STATE_MOTOR_WORK', 'ICE_STATE_OUT_SOL', 'ICE_STATE_RD', 'JRT_ENCODER', 'JRT_JEGB', 'JRT_JEGG', 'Message', 'MoveCOrientationOption', 'MoveCRotationOption', 'MoveITPLOption', 'MoveLBOption', 'MoveLCOption', 'MoveLCProperty', 'MovePBOption', 'MoveServoTOption', 'OR_2FG7_MAX_EXT', 'OR_2FG7_MAX_INT', 'OR_2FG7_MIN_EXT', 'OR_2FG7_MIN_INT', 'OR_2FG7_POS_EXT', 'OR_2FG7_POS_INT', 'OR_2FG7_STATE', 'OR_3FG_BUSY', 'OR_3FG_CALIB', 'OR_3FG_FORCE', 'OR_3FG_FORCE_GRIP', 'OR_3FG_GRIP', 'OR_3FG_MAX_D', 'OR_3FG_MIN_D', 'OR_3FG_RAW_D', 'OR_3FG_REAL_D', 'OR_EYE_COUNT', 'OR_EYE_ERROR', 'OR_EYE_INSPECT_MATCH', 'OR_EYE_INSPECT_RESULT', 'OR_EYE_POS', 'OR_EYE_RX', 'OR_EYE_RY', 'OR_EYE_RZ', 'OR_EYE_X', 'OR_EYE_Y', 'OR_EYE_Z', 'OR_MG10_ERROR', 'OR_MG10_STATUS', 'OR_MG10_STRENGTH', 'OR_RG_BUSY', 'OR_RG_ERROR', 'OR_RG_GRIP', 'OR_RG_S1_PUSHED', 'OR_RG_S1_TRIGGERED', 'OR_RG_S2_PUSHED', 'OR_RG_S2_TRIGGERED', 'OR_RG_WIDTH', 'OR_SD_BUTTON', 'OR_SD_ERROR', 'OR_SD_MOTOR_RUNNING', 'OR_SD_MOTOR_STOPPED', 'OR_SD_RAMP_DW', 'OR_SD_RAMP_UP', 'OR_SD_RPM', 'OR_SD_RPM_DEV', 'OR_SD_RPM_TAR', 'OR_SD_STATUS', 'OR_SD_VIBRATION', 'OR_SD_WARNING', 'OR_SG_MAX_WIDTH', 'OR_SG_MIN_WIDTH', 'OR_SG_STATUS', 'OR_SG_WIDTH', 'OR_VGP20_A', 'OR_VGP20_A_GRIP', 'OR_VGP20_A_RELEASE', 'OR_VGP20_B', 'OR_VGP20_BUSY', 'OR_VGP20_B_GRIP', 'OR_VGP20_B_RELEASE', 'OR_VGP20_C', 'OR_VGP20_C_GRIP', 'OR_VGP20_C_RELEASE', 'OR_VGP20_D', 'OR_VGP20_D_GRIP', 'OR_VGP20_D_RELEASE', 'OR_VGP20_ERROR', 'OR_VG_A', 'OR_VG_B', 'OperationMode', 'PICKIT_BUILD_BKG_CLOUD_FAILED', 'PICKIT_BUILD_BKG_CLOUD_OK', 'PICKIT_CONFIG_FAILED', 'PICKIT_CONFIG_OK', 'PICKIT_EMPTY_ROI', 'PICKIT_FIND_CALIB_PLATE_FAILED', 'PICKIT_FIND_CALIB_PLATE_OK', 'PICKIT_GET_PICK_POINT_DATA_FAILED', 'PICKIT_GET_PICK_POINT_DATA_OK', 'PICKIT_IDLE_MODE', 'PICKIT_IMAGE_CAPTURED', 'PICKIT_M0', 'PICKIT_M1', 'PICKIT_NO_IMAGE_CAPTURED', 'PICKIT_NO_OBJECTS', 'PICKIT_OBJECT_FOUND', 'PICKIT_P0', 'PICKIT_P0F', 'PICKIT_P1', 'PICKIT_P1F', 'PICKIT_P2', 'PICKIT_P2F', 'PICKIT_P3', 'PICKIT_P3F', 'PICKIT_P4', 'PICKIT_P4F', 'PICKIT_P5', 'PICKIT_P5F', 'PICKIT_POS', 'PICKIT_ROBOTTYPE', 'PICKIT_ROBOT_MODE', 'PICKIT_RX', 'PICKIT_RY', 'PICKIT_RZ', 'PICKIT_SAVE_SNAPSHOT_FAILED', 'PICKIT_SAVE_SNAPSHOT_OK', 'PICKIT_STATUS', 'PICKIT_TYPE_BLOB', 'PICKIT_TYPE_CIRCLE', 'PICKIT_TYPE_CYLINDER', 'PICKIT_TYPE_ELLIPSE', 'PICKIT_TYPE_POINTCLOUD', 'PICKIT_TYPE_RECTANGLE', 'PICKIT_TYPE_SPHERE', 'PICKIT_TYPE_SQUARE', 'PICKIT_UNKNOWN_COMMAND', 'PICKIT_VERSION', 'PICKIT_X', 'PICKIT_Y', 'PICKIT_Z', 'RC_PICKIT_CAPTURE_IMAGE', 'RC_PICKIT_CHECK_MODE', 'RC_PICKIT_CONFIGURE', 'RC_PICKIT_FIND_CALIB_PLATE', 'RC_PICKIT_GET_PICK_POINT_DATA', 'RC_PICKIT_LOOK_FOR_OBJECTS', 'RC_PICKIT_LOOK_FOR_OBJECTS_WITH_RETRIES', 'RC_PICKIT_NEXT_OBJECT', 'RC_PICKIT_NO_COMMAND', 'RC_PICKIT_PROCESS_IMAGE', 'RC_PICKIT_SAVE_SCENE', 'RC_PICKIT_SET_CYLINDER_DIM', 'RC_SAVE_ACTIVE_PRODUCT', 'RC_SAVE_ACTIVE_SETUP', 'RC_SAVE_BUILD_BACKGROUND', 'ReferenceFrame', 'Response', 'ResponseCollector', 'ReturnType', 'RobotState', 'SD_ARM_POWER', 'SD_BEGIN_J0', 'SD_BEGIN_J1', 'SD_BEGIN_J2', 'SD_BEGIN_J3', 'SD_BEGIN_J4', 'SD_BEGIN_J5', 'SD_BIT_0_11', 'SD_BIT_0_15', 'SD_BIT_0_3', 'SD_BIT_0_7', 'SD_BIT_12_15', 'SD_BIT_4_7', 'SD_BIT_8_11', 'SD_COLLISION_DETECT_STATE', 'SD_CONV_POS_TICK', 'SD_CONV_VEL_TICK', 'SD_CURRENT_DELTA', 'SD_DEFAULT_SPEED', 'SD_DIGITAL_IN_CONFIG_0', 'SD_DIGITAL_IN_CONFIG_1', 'SD_DWELD_A', 'SD_DWELD_ARC', 'SD_DWELD_F', 'SD_DWELD_SET_A', 'SD_DWELD_TOUCH', 'SD_DWELD_V', 'SD_EMG_BUTTON_STATE', 'SD_FINISH_AT_EVENT', 'SD_FORCE_TRAVEL_DIS', 'SD_HAND_TOKTOK', 'SD_ID_NUMBER', 'SD_INBOX_CHECK_MODE_0', 'SD_INBOX_CHECK_MODE_1', 'SD_INBOX_TRAP_FLAG_0', 'SD_INBOX_TRAP_FLAG_1', 'SD_INIT_ERR', 'SD_INIT_STATE_INFO', 'SD_IS_BEGIN', 'SD_IS_FREE_DRIVE_MODE', 'SD_IS_HOME', 'SD_IS_INTENDED_STOP', 'SD_IS_IN_MAIN', 'SD_IS_RUN_IN_MAKE', 'SD_IS_RUN_IN_PLAY', 'SD_IS_TPU_CONNECT', 'SD_J0_ANG', 'SD_J0_CUR', 'SD_J0_REF', 'SD_J0_VEL', 'SD_J1_ANG', 'SD_J1_CUR', 'SD_J1_REF', 'SD_J1_VEL', 'SD_J2_ANG', 'SD_J2_CUR', 'SD_J2_REF', 'SD_J2_VEL', 'SD_J3_ANG', 'SD_J3_CUR', 'SD_J3_REF', 'SD_J3_VEL', 'SD_J4_ANG', 'SD_J4_CUR', 'SD_J4_REF', 'SD_J4_VEL', 'SD_J5_ANG', 'SD_J5_CUR', 'SD_J5_REF', 'SD_J5_VEL', 'SD_MOTION_TIME', 'SD_MOVE_INDEX', 'SD_MOVE_INDEX_F', 'SD_MOVE_PROPERTY', 'SD_NO_ARC_STATE', 'SD_OP_STAT_COLLISION_OCCUR', 'SD_OP_STAT_EMS_FLAG', 'SD_OP_STAT_ESTOP_OCCUR', 'SD_OP_STAT_SELF_COLLISION', 'SD_OP_STAT_SOS_FLAG', 'SD_PG_MODE', 'SD_POWER_STATE', 'SD_ROBOT_STATE', 'SD_SOCK_IS_OPEN_0', 'SD_SOCK_IS_OPEN_1', 'SD_SOCK_IS_OPEN_2', 'SD_SOCK_IS_OPEN_3', 'SD_SOCK_IS_OPEN_4', 'SD_SOCK_LAST_READ_0', 'SD_SOCK_LAST_READ_1', 'SD_SOCK_LAST_READ_2', 'SD_SOCK_LAST_READ_3', 'SD_SOCK_LAST_READ_4', 'SD_TCP_RX', 'SD_TCP_RY', 'SD_TCP_RZ', 'SD_TCP_VEL_REF', 'SD_TCP_X', 'SD_TCP_Y', 'SD_TCP_Z', 'SD_TEMPERATURE_MC0', 'SD_TEMPERATURE_MC1', 'SD_TEMPERATURE_MC2', 'SD_TEMPERATURE_MC3', 'SD_TEMPERATURE_MC4', 'SD_TEMPERATURE_MC5', 'SD_TFB_ANALOG_IN_0', 'SD_TFB_ANALOG_IN_1', 'SD_TFB_DIGITAL_IN_0', 'SD_TFB_DIGITAL_IN_1', 'SD_TFB_DIGITAL_OUT_0', 'SD_TFB_DIGITAL_OUT_1', 'SD_TFB_VOLTAGE_OUT', 'SD_TF_LRF_DISTANCE', 'SD_TF_LRF_QUALITY', 'SD_TIME', 'SD_TIMER_0', 'SD_TIMER_1', 'SD_TIMER_2', 'SD_TIMER_3', 'SD_TIMER_4', 'SD_TIMER_5', 'SD_TIMER_6', 'SD_TIMER_7', 'SD_TIMER_8', 'SD_TIMER_9', 'SETECH_ALM', 'SETECH_BUSY', 'SETECH_COMP', 'SETECH_NG_ANGH', 'SETECH_NG_ANGL', 'SETECH_NG_CH1', 'SETECH_NG_CH16', 'SETECH_NG_CH2', 'SETECH_NG_CH4', 'SETECH_NG_CH8', 'SETECH_NG_MONI', 'SETECH_NG_TIME', 'SETECH_NG_TRQH', 'SETECH_NG_TRQL', 'SETECH_OK', 'SETECH_RDY', 'SystemState', 'SystemVariable', 'asyncio', 'to_string']
+class BlendingOption:
+    """
+    Members:
+    
+      Ratio : Blend based on Ratio
+    
+      Distance : Blend based on Distance
+    """
+    Distance: typing.ClassVar[BlendingOption]  # value = <BlendingOption.Distance: 1>
+    Ratio: typing.ClassVar[BlendingOption]  # value = <BlendingOption.Ratio: 0>
+    __members__: typing.ClassVar[dict[str, BlendingOption]]  # value = {'Ratio': <BlendingOption.Ratio: 0>, 'Distance': <BlendingOption.Distance: 1>}
+    def __eq__(self, other: typing.Any) -> bool:
+        ...
+    def __getstate__(self) -> int:
+        ...
+    def __hash__(self) -> int:
+        ...
+    def __index__(self) -> int:
+        ...
+    def __init__(self, value: typing.SupportsInt) -> None:
+        ...
+    def __int__(self) -> int:
+        ...
+    def __ne__(self, other: typing.Any) -> bool:
+        ...
+    def __repr__(self) -> str:
+        ...
+    def __setstate__(self, state: typing.SupportsInt) -> None:
+        ...
+    def __str__(self) -> str:
+        ...
+    @property
+    def name(self) -> str:
+        ...
+    @property
+    def value(self) -> int:
+        ...
+class Cobot:
+    def __init__(self, address: str, port: typing.SupportsInt = 5000) -> None:
+        """
+        Class is for interacting with Rainbow Robotics Cobot.
+        
+        Parameters
+        ----------
+        address : str
+            IP address for command channel (e.g. 10.0.2.7). You can set up via teaching pendant (UI)
+        port : int
+            a port number for command channel (default: 5000).
+        
+        Example
+        -------
+        >>> robot = rb.cobot("10.0.2.7")
+        >>> rc = rb.ResponseCollector()
+        >>> robot.set_operation_mode(rc, rb.OperationMode.Real)
+        """
+    def activate(self, response_collector: ResponseCollector, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = True) -> ReturnType:
+        """
+        Turn on the power supply for the robot arm. If the robot is already activated or has some errors, it returns immediately.
+        
+        Warning
+        -------
+        The robot arm will power up. Be careful when you use this function.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        """
+    @typing.overload
+    def calc_fk_tcp(self, response_collector: ResponseCollector, point: typing.Annotated[numpy.typing.ArrayLike, numpy.float64], j0: typing.SupportsFloat, j1: typing.SupportsFloat, j2: typing.SupportsFloat, j3: typing.SupportsFloat, j4: typing.SupportsFloat, j5: typing.SupportsFloat, timeout: typing.SupportsFloat = -1, return_on_error: bool = False) -> ReturnType:
+        """
+        Calculate TCP posture w.r.t. global (base) coordinate from six joint angles.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        point : numpy.ndarray(shape=(6, 1))
+            TCP pose [x, y, z, rx, ry, rz] w.r.t. global (base) coordinate
+        j0, j1, j2, j3, j4, j5: joint angles (unit: degree)
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        
+        Examples
+        --------
+        >>> pnt = np.zeros((6,))
+        >>> res = robot.calc_fk_tcp(rc, pnt, 0, 0, 0, 0, 0, 0)
+        """
+    @typing.overload
+    def calc_fk_tcp(self, response_collector: ResponseCollector, j0: typing.SupportsFloat, j1: typing.SupportsFloat, j2: typing.SupportsFloat, j3: typing.SupportsFloat, j4: typing.SupportsFloat, j5: typing.SupportsFloat, timeout: typing.SupportsFloat = -1, return_on_error: bool = False) -> tuple[ReturnType, typing.Annotated[numpy.typing.NDArray[numpy.float64], "[6, 1]"]]:
+        """
+        Calculate TCP posture w.r.t. global (base) coordinate from six joint angles.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        j0, j1, j2, j3, j4, j5: joint angles (unit: degree)
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        
+        numpy.ndarray(shape=(6, 1))
+            TCP pose [x, y, z, rx, ry, rz] w.r.t. global (base) coordinate
+        
+        
+        Examples
+        --------
+        >>> [res, pnt] = robot.calc_fk_tcp(rc, 0, 0, 0, 0, 0, 0, -1, False)
+        """
+    @typing.overload
+    def calc_fk_tcp(self, response_collector: ResponseCollector, point: typing.Annotated[numpy.typing.ArrayLike, numpy.float64], joint: typing.Annotated[numpy.typing.NDArray[numpy.float64], "[6, 1]"], timeout: typing.SupportsFloat = -1, return_on_error: bool = False) -> ReturnType:
+        """
+        Calculate TCP posture w.r.t. global (base) coordinate from six joint angles.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        [out] point : numpy.ndarray(shape=(6, 1))
+            TCP pose [x, y, z, rx, ry, rz] w.r.t. global (base) coordinate
+        joint : numpy.ndarray(shape=(6, 1))
+            Single joint type variable which contains six joint-angles.
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        
+        Examples
+        --------
+        >>> pnt = np.zeros((6,))
+        >>> res = robot.calc_fk_tcp(rc, pnt, np.zeros((6,)))
+        """
+    @typing.overload
+    def calc_fk_tcp(self, response_collector: ResponseCollector, joint: typing.Annotated[numpy.typing.NDArray[numpy.float64], "[6, 1]"], timeout: typing.SupportsFloat = -1.0, return_on_error: bool = False) -> tuple[ReturnType, typing.Annotated[numpy.typing.NDArray[numpy.float64], "[6, 1]"]]:
+        """
+        Calculate TCP posture w.r.t. global (base) coordinate from six joint angles.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        joint : numpy.ndarray(shape=(6, 1))
+            Single joint type variable which contains six joint-angles.
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        
+        point : numpy.ndarray(shape=(6, 1))
+            TCP pose [x, y, z, rx, ry, rz] w.r.t. global (base) coordinate
+        
+        Examples
+        --------
+        >>> [res, pnt] = robot.calc_fk_tcp(rc, np.zeros((6,)))
+        """
+    def disable_waiting_ack(self, response_collector: ResponseCollector) -> bool:
+        ...
+    def enable_waiting_ack(self, response_collector: ResponseCollector) -> bool:
+        ...
+    def eval(self, response_collector: ResponseCollector, script: str, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = False) -> ReturnType:
+        """
+        A function that evaluates a script on the 'Cobot'.
+        
+        This function sends the given script to the 'Cobot' for evaluation and waits for the response from the 'Cobot'. In the case of failure, the function returns 'Timeout' or 'Error'.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        script : str
+            The script to be evaluated.
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        """
+    def flush(self, response_collector: ResponseCollector) -> None:
+        ...
+    def get_control_box_info(self, response_collector: ResponseCollector, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = False) -> tuple[ReturnType, ControlBoxInfo]:
+        """
+        Retrieves information about the control box.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        
+        ControlBoxInfo
+            Information including "system version" and "robot box type"
+        
+        Examples
+        --------
+        >>> res, info = robot.get_control_box_info(rc)
+        >>> print(info)
+        { "SystemVersion": 24021504, "RobotBoxType": 11 }
+        """
+    def get_robot_state(self, response_collector: ResponseCollector, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = False) -> tuple[ReturnType, RobotState]:
+        ...
+    def get_system_variable(self, response_collector: ResponseCollector, system_variable: SystemVariable, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = False) -> tuple[ReturnType, float]:
+        ...
+    def get_tcp_info(self, response_collector: ResponseCollector, timeout: typing.SupportsFloat = -1, return_on_error: bool = False) -> tuple[ReturnType, typing.Annotated[numpy.typing.NDArray[numpy.float64], "[6, 1]"]]:
+        """
+        This function returns the TCP information of the current robot.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        
+        numpy.ndarray(shape=(6, 1))
+            TCP of the current robot with respect to the global coordinate system. (Unit: mm & degree)
+        
+        
+        Examples
+        --------
+        >>> [res, pnt] = robot.get_tcp_info(rc)
+        """
+    def get_tfc_info(self, response_collector: ResponseCollector, timeout: typing.SupportsFloat = -1, return_on_error: bool = False) -> tuple[ReturnType, typing.Annotated[numpy.typing.NDArray[numpy.float64], "[6, 1]"]]:
+        """
+        This function returns the TFC (Tool flange center) information of the current robot.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        
+        numpy.ndarray(shape=(6, 1))
+            TFC of the current robot based on the global coordinate system. (Unit: mm & degree)
+        
+        
+        Examples
+        --------
+        >>> [res, pnt] = robot.get_tfc_info(rc)
+        """
+    def gripper_rts_rhp12rn_force_control(self, response_collector: ResponseCollector, conn_point: GripperConnectionPoint, target_force_ratio: typing.SupportsInt, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = False) -> ReturnType:
+        ...
+    def gripper_rts_rhp12rn_position_control(self, response_collector: ResponseCollector, conn_point: GripperConnectionPoint, target_position_ratio: typing.SupportsInt, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = False) -> ReturnType:
+        ...
+    def gripper_rts_rhp12rn_select_mode(self, response_collector: ResponseCollector, conn_point: GripperConnectionPoint, force: typing.SupportsInt, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = False) -> ReturnType:
+        ...
+    def gripper_rts_rhp12rn_set_force_limit(self, response_collector: ResponseCollector, conn_point: GripperConnectionPoint, limit: typing.SupportsInt, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = False) -> ReturnType:
+        ...
+    def move_c_axis(self, response_collector: ResponseCollector, center: typing.Annotated[numpy.typing.NDArray[numpy.float64], "[6, 1]"], x_axis: typing.SupportsFloat, y_axis: typing.SupportsFloat, z_axis: typing.SupportsFloat, angle: typing.SupportsFloat, speed: typing.SupportsFloat, acceleration: typing.SupportsFloat, option: MoveCRotationOption, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = False) -> ReturnType:
+        """
+        This function performs a movement that draws an arc through via & target points.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        center : numpy.ndarray(shape=(6, 1))
+            Center of the rotation (Unit: mm)
+        x_axis : float
+            Rotation axis's x axis vector
+        y_axis : float
+            Rotation axis's y axis vector
+        z_axis : float
+            Rotation axis's z axis vector
+        angle : float
+            Rotation angle (Unit: deg)
+        speed : float
+            Speed (Unit: mm/s)
+        acceleration : float
+            Acceleration (Unit: mm/s^2)
+        option : MoveCRotationOption
+            Rotation options. (0 : Intended, 1 : Constant, 2 : Radial)
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        
+        Examples
+        --------
+        >>> robot.move_c_axis(rc, {200, 200, 200, 0, 0, 0}, 1, 0, 0, 180, 50, 10, 2)
+        >>> # Rotate 180 degrees around the x-axis. Center of rotation is '{200, 200, 200, 0, 0, 0}'. Based on the center point of the rotation, the orientation of the TCP is changed together.
+        """
+    def move_c_points(self, response_collector: ResponseCollector, via_point: typing.Annotated[numpy.typing.NDArray[numpy.float64], "[6, 1]"], target_point: typing.Annotated[numpy.typing.NDArray[numpy.float64], "[6, 1]"], speed: typing.SupportsFloat, acceleration: typing.SupportsFloat, option: MoveCOrientationOption, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = False) -> ReturnType:
+        """
+        This function performs a movement that draws an arc through via & target points.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        via_point : numpy.ndarray(shape=(6, 1))
+            via Point TCP posture.
+        target_point: numpy.ndarray(shape=(6, 1))
+            target Point TCP posture.
+        speed : float
+            Speed (Unit: mm/s)
+        acceleration : float
+            Acceleration (Unit: mm/s^2)
+        option : MoveCOrientationOption
+            Orientation options. (0 : Intended, 1 : Constant, 2 : Radial, 3 : Smooth)
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        """
+    def move_itpl_add(self, response_collector: ResponseCollector, point: typing.Annotated[numpy.typing.NDArray[numpy.float64], "[6, 1]"], speed: typing.SupportsFloat, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = False) -> ReturnType:
+        """
+        This function adds the points used in MoveITPL to the list.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        point : numpy.ndarray(shape=(6, 1))
+            Target TCP posture. (Point)
+        speed : float
+            Speed (Unit: mm/s)
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        """
+    def move_itpl_clear(self, response_collector: ResponseCollector, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = False) -> ReturnType:
+        """
+        Initialize (Clear) the point list to be used in MoveITPL.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        """
+    def move_itpl_run(self, response_collector: ResponseCollector, acceleration: typing.SupportsFloat, option: MoveITPLOption, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = False) -> ReturnType:
+        """
+        This function executes MoveITPL using the points added in move_itpl_add.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        acceleration : float
+            Acceleration
+        option : MoveITPLOption
+            Orientation/motion option. (CA : Combined Arc mode)
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        """
+    def move_j(self, response_collector: ResponseCollector, joint: typing.Annotated[numpy.typing.NDArray[numpy.float64], "[6, 1]"], speed: typing.SupportsFloat, acceleration: typing.SupportsFloat, timeout: typing.SupportsFloat = -1.0, return_on_err: bool = False) -> ReturnType:
+        """
+        Move the robot arm to the target joint angle in joint space.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        joint : numpy.ndarray(shape=(6, 1))
+            Target joint angles. (Joint)
+        speed : float
+            Speed (Unit: deg/s)
+        acceleration : float
+            Acceleration (Unit: deg/s^2)
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        
+        Examples
+        --------
+        >>> robot.move_j(rc, {0, 0, 90, 0, 90, 0}, 60, 80) // move joint angles to (0,0,90,0,90,0) degree with speed/acceleration = 60/80.
+        """
+    def move_jb2_add(self, response_collector: ResponseCollector, joint: typing.Annotated[numpy.typing.NDArray[numpy.float64], "[6, 1]"], speed: typing.SupportsFloat, acceleration: typing.SupportsFloat, blending_value: typing.SupportsFloat, timeout: typing.SupportsFloat = -1, return_on_err: bool = False) -> ReturnType:
+        ...
+    def move_jb2_clear(self, response_collector: ResponseCollector, timeout: typing.SupportsFloat = -1, return_on_err: bool = False) -> ReturnType:
+        ...
+    def move_jb2_run(self, response_collector: ResponseCollector, timeout: typing.SupportsFloat = -1, return_on_err: bool = False) -> ReturnType:
+        ...
+    def move_jb_add(self, response_collector: ResponseCollector, joint: typing.Annotated[numpy.typing.NDArray[numpy.float64], "[6, 1]"], timeout: typing.SupportsFloat = -1.0, return_on_error: bool = False) -> ReturnType:
+        """
+        This function adds the joint-angles used in MoveJB to the list.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        joint : numpy.ndarray(shape=(6, 1))
+            Target joint angles (Unit: deg)
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        """
+    def move_jb_clear(self, response_collector: ResponseCollector, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = False) -> ReturnType:
+        """
+        Initialize (Clear) the point list to be used in MoveJB.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        """
+    def move_jb_run(self, response_collector: ResponseCollector, speed: typing.SupportsFloat, acceleration: typing.SupportsFloat, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = False) -> ReturnType:
+        """
+        This function executes MoveJB using the points added in move_jb_add.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        speed : float
+            Speed (Unit: deg/s)
+        acceleration : float
+            Acceleration (Unit: deg/s^2)
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        """
+    def move_jl(self, response_collector: ResponseCollector, point: typing.Annotated[numpy.typing.NDArray[numpy.float64], "[6, 1]"], speed: typing.SupportsFloat, acceleration: typing.SupportsFloat, timeout: typing.SupportsFloat = -1.0, return_on_err: bool = False) -> ReturnType:
+        """
+        This function moves to the target point using the move_j method rather than a straight line.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        point : numpy.ndarray(shape=(6, 1))
+            Target TCP posture. (Point)
+        speed : float
+            Speed (Unit: deg/s)
+        acceleration : float
+            Acceleration (Unit: deg/s^2)
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        
+        Examples
+        --------
+        >>> robot.move_jl(rc, {100, 200, 300, 0, 0, 0}, 20, 5) // Move TCP to '{x = 100, y = 200, z = 300, rx = 0, ry = 0, rz = 0}' via MoveJ method.
+        """
+    def move_l(self, response_collector: ResponseCollector, point: typing.Annotated[numpy.typing.NDArray[numpy.float64], "[6, 1]"], speed: typing.SupportsFloat, acceleration: typing.SupportsFloat, timeout: typing.SupportsFloat = -1.0, return_on_err: bool = False) -> ReturnType:
+        """
+        A function that makes TCP to move in a straight line to the target point.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        point : numpy.ndarray(shape=(6, 1))
+            Target TCP pose
+        speed : float
+            Speed (unit: mm/s)
+        acceleration : float
+            Acceleration (unit: mm/s^2)
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        
+        Examples
+        --------
+        >>> my_point1 = np.array([100, 200, 300, 0, 0, 0])
+        >>> my_point2 = np.array([100, 150, 100, 0, 90, 0])
+        >>> robot.move_l(rc, my_point1, 20, 5)
+        >>> robot.move_l(rc, my_point2, 20, 5)
+        """
+    def move_l_rel(self, response_collector: ResponseCollector, point: typing.Annotated[numpy.typing.NDArray[numpy.float64], "[6, 1]"], speed: typing.SupportsFloat, acceleration: typing.SupportsFloat, frame: ReferenceFrame, timeout: typing.SupportsFloat = -1, return_on_error: bool = False) -> ReturnType:
+        """
+        A function that makes TCP to move in a straight line to the target point.
+        Enter the target point as a value relative to the current TCP value.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        point : numpy.ndarray(shape=(6, 1))
+            Target TCP pose
+        speed : float
+            Speed (unit: mm/s)
+        acceleration : float
+            Acceleration (unit: mm/s^2)
+        frame : ReferenceFrame
+            Reference frame for the relative point value.
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        
+        Examples
+        --------
+        >>> target_point = np.array([0, 100, -200, 0, 0, 0])
+        >>> robot.move_l_rel(rc, target_point, 300, 400, rb.ReferenceFrame.Base) # move TCP (0,100,-200) w.r.t. Base coordinate (speed/acceleration = 300 / 400)
+        """
+    def move_lb_add(self, response_collector: ResponseCollector, point: typing.Annotated[numpy.typing.NDArray[numpy.float64], "[6, 1]"], blend_distance: typing.SupportsFloat, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = False) -> ReturnType:
+        """
+        This function adds the points used in MoveLB to the list.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        point : numpy.ndarray(shape=(6, 1))
+            Target TCP posture. (Point)
+        blend_distance : float
+            Blend distance. (Unit: mm)
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        """
+    def move_lb_clear(self, response_collector: ResponseCollector, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = False) -> ReturnType:
+        """
+        Initialize (Clear) the point list to be used in MoveLB.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        """
+    def move_lb_run(self, response_collector: ResponseCollector, speed: typing.SupportsFloat, acceleration: typing.SupportsFloat, option: MoveLBOption, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = False) -> ReturnType:
+        """
+        This function executes MoveLB using the points added in move_lb_add.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        speed : float
+            Speed (Unit: mm/s)
+        acceleration : float
+            Acceleration (Unit: mm/s^2)
+        option : MoveLBOption
+            Orientation options. (0 : Intended, 1 : Constant)
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        """
+    def move_lc_add(self, response_collector: ResponseCollector, point: typing.Annotated[numpy.typing.NDArray[numpy.float64], "[6, 1]"], speed: typing.SupportsFloat, property: MoveLCProperty, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = False) -> ReturnType:
+        """
+        This function adds the points used in MoveLC to the list.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        point : numpy.ndarray(shape=(6, 1))
+            Target TCP posture. (Point)
+        speed : float
+            Speed (Unit: mm/s)
+        property : MoveLCProperty
+            0 or 1 (0 : Pass through linear motion, 1 : Pass through circular motion)
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        """
+    def move_lc_clear(self, response_collector: ResponseCollector, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = False) -> ReturnType:
+        """
+        Initialize (Clear) the point list to be used in MoveLC.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        """
+    def move_lc_run(self, response_collector: ResponseCollector, acceleration: typing.SupportsFloat, option: MoveLCOption, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = False) -> ReturnType:
+        """
+        This function executes MoveITPL using the points added in move_itpl_add.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        acceleration : float
+            Acceleration
+        option : MoveLCOption
+            Orientation options
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        """
+    def move_pb_add(self, response_collector: ResponseCollector, point: typing.Annotated[numpy.typing.NDArray[numpy.float64], "[6, 1]"], speed: typing.SupportsFloat, option: BlendingOption, blending_value: typing.SupportsFloat, timeout: typing.SupportsFloat = -1, return_on_error: bool = False) -> ReturnType:
+        """
+        This function adds the points used in MovePB to the list.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        point : numpy.ndarray(shape=(6, 1))
+            Target TCP posture. (Point)
+        speed : float
+            Speed (Unit: mm/s)
+        option : BlendingOption
+            Blending option (0: blend based on ratio, 1: blend based on distance.)
+        blending_value : float
+            Blending value (0~1 in ratio option or distance in distance option (Unit: mm)
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        
+        Examples
+        --------
+        >>> robot.move_pb_clear(rc)
+        >>> robot.move_pb_add(rc, np.array([100, 200, 200, 90, 0, 0]), 200.0, rb.BlendingOption.Ratio, 0.5)
+        >>> robot.move_pb_add(rc, np.array([300, 300, 400, 0, 0, 0]), 400.0, rb.BlendingOption.Ratio, 0.5)
+        >>> robot.move_pb_add(rc, np.array([0, 200, 400, 90, 0, 0]), 200.0, rb.BlendingOption.Ratio, 0.5)
+        >>> robot.move_pb_run(rc, 800, rb.MovePBOption.Intended)
+        """
+    def move_pb_clear(self, response_collector: ResponseCollector, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = False) -> ReturnType:
+        """
+        Initialize (Clear) the point list to be used in MovePB.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        """
+    def move_pb_run(self, response_collector: ResponseCollector, acceleration: typing.SupportsFloat, option: MovePBOption, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = False) -> ReturnType:
+        """
+        This function executes MovePB using the points added in move_pb_add.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        acceleration : float
+            Acceleration (Unit: mm/s^2)
+        option : MovePBOption
+            Orientation option (0: Intended, 1: Constant)
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        """
+    def move_servo_j(self, response_collector: ResponseCollector, joint: typing.Annotated[numpy.typing.NDArray[numpy.float64], "[6, 1]"], t1: typing.SupportsFloat, t2: typing.SupportsFloat, gain: typing.SupportsFloat, alpha: typing.SupportsFloat, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = False) -> ReturnType:
+        ...
+    def move_servo_l(self, response_collector: ResponseCollector, joint: typing.Annotated[numpy.typing.NDArray[numpy.float64], "[6, 1]"], t1: typing.SupportsFloat, t2: typing.SupportsFloat, gain: typing.SupportsFloat, alpha: typing.SupportsFloat, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = False) -> ReturnType:
+        ...
+    def move_servo_t(self, response_collector: ResponseCollector, joint: typing.Annotated[numpy.typing.NDArray[numpy.float64], "[6, 1]"], t1: typing.SupportsFloat, t2: typing.SupportsFloat, compensation: typing.SupportsInt, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = False) -> ReturnType:
+        ...
+    def move_speed_j(self, response_collector: ResponseCollector, joint: typing.Annotated[numpy.typing.NDArray[numpy.float64], "[6, 1]"], t1: typing.SupportsFloat, t2: typing.SupportsFloat, gain: typing.SupportsFloat, alpha: typing.SupportsFloat, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = False) -> ReturnType:
+        ...
+    def move_speed_l(self, response_collector: ResponseCollector, joint: typing.Annotated[numpy.typing.NDArray[numpy.float64], "[6, 1]"], t1: typing.SupportsFloat, t2: typing.SupportsFloat, gain: typing.SupportsFloat, alpha: typing.SupportsFloat, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = False) -> ReturnType:
+        ...
+    def print_variable(self, response_collector: ResponseCollector, variable_name: str, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = False) -> tuple[ReturnType, str]:
+        ...
+    def rt_script(self, response_collector: ResponseCollector, single_command: str, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = False) -> ReturnType:
+        ...
+    def rt_script_onoff(self, response_collector: ResponseCollector, on: bool, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = False) -> ReturnType:
+        ...
+    def set_acc_multiplier(self, response_collector: ResponseCollector, multiplier: typing.SupportsFloat, timeout: typing.SupportsFloat = -1, return_on_error: bool = False) -> ReturnType:
+        """
+        Sets the overall acceleration multiplier.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        multiplier : float
+            Multiply variable. (0~2) Default value is 1.0.
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        """
+    def set_box_aout(self, response_collector: ResponseCollector, port: typing.SupportsInt, voltage: typing.SupportsFloat, timeout: typing.SupportsFloat = -1, return_on_error: bool = False) -> ReturnType:
+        """
+        Set the analog output of the control box.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        port : int
+            Port number for the analog output. (0~15)
+        voltage : float
+            Desired output voltage (0~10V, Unit: V)
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        """
+    def set_box_dout(self, response_collector: ResponseCollector, port: typing.SupportsInt, mode: DigitalIOMode, timeout: typing.SupportsFloat = -1, return_on_error: bool = False) -> ReturnType:
+        """
+        Set the digital output of the control box.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        port : int
+            Port number for the digital output.
+        mode : DigitalIOMode
+            Output mode selection
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        """
+    def set_box_dout_toggle(self, response_collector: ResponseCollector, port: typing.SupportsInt, timeout: typing.SupportsFloat = -1, return_on_error: bool = False) -> ReturnType:
+        """
+        Toggles the current digital output of the control box.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        port : int
+            Port number for the analog output. (0~15)
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        """
+    def set_collision_after(self, response_collector: ResponseCollector, mode: CollisionFollowUpMode, timeout: typing.SupportsFloat = -1, return_on_error: bool = False) -> ReturnType:
+        """
+        Set the program flow direction after the collision detection.
+        
+        Warning
+        -------
+        The value set in this function returns to the default value after the program ends.
+        If this function is not called in program-flow, the value set in the Setup page is used.
+        During program flow, the value set in this function is maintained until this function is called again.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        mode : CollisionReactionMode
+            A variable represents a stop mode.
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        """
+    def set_collision_mode(self, response_collector: ResponseCollector, mode: CollisionMode, timeout: typing.SupportsFloat = -1, return_on_error: bool = False) -> ReturnType:
+        """
+        Set the stop-mode after the collision detection.
+        
+        Warning
+        -------
+        The value set in this function returns to the default value after the program ends.
+        If this function is not called in program-flow, the value set in the Setup page is used.
+        During program flow, the value set in this function is maintained until this function is called again.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        mode : CollisionMode
+            The variable represents a stop mode.
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        """
+    def set_collision_onoff(self, response_collector: ResponseCollector, on: bool, timeout: typing.SupportsFloat = -1, return_on_error: bool = False) -> ReturnType:
+        """
+        This function turns on/off the collision detection function.
+        
+        Warning
+        -------
+        The value set in this function returns to the default value after the program ends.
+        If this function is not called in program-flow, the value set in the Setup page is used.
+        During program flow, the value set in this function is maintained until this function is called again.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        on : bool
+            The variable represents an on/off state, where 0 is off and 1 is on.
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        """
+    def set_collision_threshold(self, response_collector: ResponseCollector, threshold: typing.SupportsFloat, timeout: typing.SupportsFloat = -1, return_on_error: bool = False) -> ReturnType:
+        """
+        Sets the collision sensitivity (threshold).
+        
+        Warning
+        -------
+        The value set in this function returns to the default value after the program ends.
+        If this function is not called in program-flow, the value set in the Setup page is used.
+        During program flow, the value set in this function is maintained until this function is called again.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        threshold : float
+            The variable represents an threshold value. The lower the value, the more sensitive to collision. (0~1)
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        """
+    def set_dout_bit_combination(self, response_collector: ResponseCollector, first_port: typing.SupportsInt, last_port: typing.SupportsInt, value: typing.SupportsInt, mode: Endian, timeout: typing.SupportsFloat = -1, return_on_error: bool = False) -> ReturnType:
+        """
+        Set the digital outputs of the control box simultaneously.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        first_port : int
+            First port number (0~15)
+        last_port : int
+            Last port number (0~15)
+            last_port must be greater or equal than first_port.
+        value : int
+            Output value for digital ports (bit combination)
+            If mode is LittleEndian and value is 5, then port 0 and port 2 will be high.
+        mode : rbpodo.Endian
+            Endian selection
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        
+        Examples
+        --------
+        >>> robot.set_dout_bit_combination(rc, 0, 15, 5, rb.Endian.LittleEndian)  # Port 0 and 2 will be high, while port 1 and 3 are low
+        >>> robot.set_dout_bit_combination(rc, 0, 15, 10, rb.Endian.LittleEndian) # Port 1 and 3 will be high, while port 0 and 2 are low
+        """
+    def set_freedrive_mode(self, response_collector: ResponseCollector, on: bool, timeout: typing.SupportsFloat = -1, return_on_error: bool = False) -> ReturnType:
+        ...
+    def set_operation_mode(self, response_collector: ResponseCollector, mode: OperationMode, timeout: typing.SupportsFloat = -1, return_on_error: bool = False) -> ReturnType:
+        """
+        Change the operation mode between real and simulation modes.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        mode : rbpodo.OperationMode
+            If set to OperationMode.Real, the robot moves when commanded.
+            If set to OperationMode.Simulation, the robot does not moves but the internal reference values changes.
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        """
+    def set_payload_info(self, response_collector: ResponseCollector, weight: typing.SupportsFloat, com_x: typing.SupportsFloat, com_y: typing.SupportsFloat, com_z: typing.SupportsFloat, timeout: typing.SupportsFloat = -1, return_on_error: bool = False) -> ReturnType:
+        """
+        Set the tool payload w.r.t. the manufacturer’s default tool coordinate system.
+        
+        Warning
+        -------
+        The value set in this function returns to the default value after the program ends.
+        If this function is not called in program-flow, the value set in the Setup page is used.
+        During program flow, the value set in this function is maintained until this function is called again.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        weight : float
+            payload weight (Unit: Kg)
+        com_x : float
+            payload center of mass x-axis value with respect to the manufacturer's default coordinate system. (Unit: mm)
+        com_y : float
+            payload center of mass y-axis value with respect to the manufacturer's default coordinate system. (Unit: mm)
+        com_z : float
+            payload center of mass z-axis value with respect to the manufacturer's default coordinate system. (Unit: mm)
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        """
+    def set_serial_box(self, response_collector: ResponseCollector, baud_rate: typing.SupportsInt, stop_bit: typing.SupportsInt, parity_bit: typing.SupportsInt, timeout: typing.SupportsFloat = -1, return_on_error: bool = False) -> ReturnType:
+        """
+        Set the serial communication (RS232/485) provided by the control box.
+        
+        Warning
+        -------
+        The value set in this function returns to the default value after the program ends.
+        If this function is not called in program-flow, the value set in the Setup page is used.
+        During program flow, the value set in this function is maintained until this function is called again.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        baud_rate : int
+            Communication speed (Baud rate)
+        stop_bit : int
+            Stop bit, (0 or 1, Default value is 1)
+        parity_bit : int
+            Parity bit, (0: none, 1: odd, 2: even, Default value is 0)
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        """
+    def set_serial_tool(self, response_collector: ResponseCollector, baud_rate: typing.SupportsInt, stop_bit: typing.SupportsInt, parity_bit: typing.SupportsInt, timeout: typing.SupportsFloat = -1, return_on_error: bool = False) -> ReturnType:
+        """
+        Set the serial communication (RS232/485) provided by the Tool Flange of the robot arm.
+        
+        Warning
+        -------
+        The value set in this function returns to the default value after the program ends.
+        If this function is not called in program-flow, the value set in the Setup page is used.
+        During program flow, the value set in this function is maintained until this function is called again.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        baud_rate : int
+            Communication speed (Baud rate)
+        stop_bit : int
+            Stop bit, (0 or 1, Default value is 1)
+        parity_bit : int
+            Parity bit, (0: none, 1: odd, 2: even, Default value is 0)
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        
+        Examples
+        --------
+        >>> robot.set_serial_tool(rc, 115200, 1, 0) # Set tool-flange serial comm. : baud rate = 115200 / stop bit = 1 / parity = none
+        """
+    def set_speed_acc_j(self, response_collector: ResponseCollector, speed: typing.SupportsFloat, acceleration: typing.SupportsFloat, timeout: typing.SupportsFloat = -1, return_on_error: bool = False) -> ReturnType:
+        """
+        Sets fixed joint velocity/acceleration for J-series motions (MoveJ, MoveJB, MoveJL).
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        speed : float
+            Speed/velocity (Unit: deg/s). Does not use negative value.
+        acceleration : float
+            Acceleration (Unit: deg/s^2). Does not use negative value.
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        """
+    def set_speed_acc_l(self, response_collector: ResponseCollector, speed: typing.SupportsFloat, acceleration: typing.SupportsFloat, timeout: typing.SupportsFloat = -1, return_on_error: bool = False) -> ReturnType:
+        """
+        Sets fixed linear velocity/acceleration for L-series motions (MoveL, MovePB, MoveLB, MoveITPL).
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        speed : float
+            Speed/velocity (Unit: mm/s)
+        acceleration : float
+            Acceleration (Unit: mm/s^2)
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        """
+    def set_speed_bar(self, response_collector: ResponseCollector, speed: typing.SupportsFloat, timeout: typing.SupportsFloat = -1, return_on_error: bool = False) -> ReturnType:
+        """
+        Set the overall speed control bar. (bottom speed control bar in UI).
+        
+        Warning
+        -------
+        When running a program on the UI Make page, this function does not work if the safety slide bar option is turned on.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        speed : float
+            Desired speed control bar position (0~1)
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        """
+    def set_speed_multiplier(self, response_collector: ResponseCollector, multiplier: typing.SupportsFloat, timeout: typing.SupportsFloat = -1, return_on_error: bool = False) -> ReturnType:
+        """
+        Sets the overall speed (velocity) multiplier.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        multiplier : float
+            Multiply variable. (0~2) Default value is 1.0.
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        """
+    def set_tcp_info(self, response_collector: ResponseCollector, point: typing.Annotated[numpy.typing.NDArray[numpy.float64], "[6, 1]"], timeout: typing.SupportsFloat = -1, return_on_error: bool = False) -> ReturnType:
+        """
+        Set the TCP position and orientation w.r.t. the manufacturer’s default tool coordinate system.
+        
+        Warning
+        -------
+        The value set in this function returns to the default value after the program ends.
+        If this function is not called in program-flow, the value set in the Setup page is used.
+        During program flow, the value set in this function is maintained until this function is called again.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        point : numpy.ndarray(shape=(6, 1))
+            position and orientation of tcp with respect to manufacturer's default tool coordinate system. (x, y, z, rx, ry, rz) (Unit: mm & degree)
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        """
+    def set_user_coordinate(self, response_collector: ResponseCollector, id: typing.SupportsInt, point: typing.Annotated[numpy.typing.NDArray[numpy.float64], "[6, 1]"], timeout: typing.SupportsFloat = -1, return_on_error: bool = False) -> ReturnType:
+        """
+        Set user coordinate
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        id : int
+            id of user coordinate to change (0~2)
+        point : numpy.ndarray(shape=(6, 1))
+            position and orientation of coordinate with respect to base frame. (x, y, z, rx, ry, rz) (Unit: mm & degree)
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        """
+    def shutdown(self, response_collector: ResponseCollector, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = True) -> ReturnType:
+        """
+        Turn off the power supply for the robot arm.
+        
+        Warning
+        -------
+        The robot arm powers up. Be careful when you use this function.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        """
+    def task_load(self, response_collector: ResponseCollector, program_name: str, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = False) -> ReturnType:
+        ...
+    def task_pause(self, response_collector: ResponseCollector, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = False) -> ReturnType:
+        ...
+    def task_play(self, response_collector: ResponseCollector, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = False) -> ReturnType:
+        ...
+    def task_resume(self, response_collector: ResponseCollector, collision: bool, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = False) -> ReturnType:
+        ...
+    def task_stop(self, response_collector: ResponseCollector, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = False) -> ReturnType:
+        ...
+    def wait_for_move_finished(self, response_collector: ResponseCollector, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = True) -> ReturnType:
+        ...
+    def wait_for_move_started(self, response_collector: ResponseCollector, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = True) -> ReturnType:
+        """
+        Wait until the motion is started.
+        
+        More specifically, the program is waiting for the response message from control box ``info[motion_changed][X]`` where ``X`` is positive integer.
+        
+        Parameters
+        ----------
+        response_collector : ResponseCollector
+            A collector object to accumulate and manage the response message.
+        timeout : float
+            The maximum duration (in seconds) to wait for a response before timing out.
+        return_on_error : bool
+            A boolean flag indicating whether the function should immediately return upon encountering an error.
+        
+        Returns
+        -------
+        ReturnType
+        
+        Examples
+        --------
+        >>> joint = np.array([0, 0, 0, 0, 0, 0])
+        >>> robot.move_j(rc, joint, 60, 80)
+        >>> rc = rc.error().throw_if_not_empty()
+        >>> if robot.wait_for_move_started(rc).type() == rb.ReturnType.Success:
+        >>>     robot.wait_for_move_finished(rc)
+        """
+    def wait_for_task_finished(self, response_collector: ResponseCollector, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = True) -> ReturnType:
+        ...
+    def wait_for_task_loaded(self, response_collector: ResponseCollector, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = True) -> ReturnType:
+        ...
+    def wait_for_task_started(self, response_collector: ResponseCollector, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = True) -> ReturnType:
+        ...
+    def wait_until(self, response_collector: ResponseCollector, func: collections.abc.Callable[[Response], bool], timeout: typing.SupportsFloat = -1.0, return_on_error: bool = False) -> ReturnType:
+        ...
+    def wait_until_ack_message(self, response_collector: ResponseCollector, timeout: typing.SupportsFloat = -1.0, return_on_error: bool = False) -> ReturnType:
+        ...
+class CobotData:
+    def __init__(self, address: str, port: typing.SupportsInt = 5001) -> None:
+        ...
+    def request_data(self, timeout: typing.SupportsFloat = -1.0) -> SystemState | None:
+        ...
+class CollisionFollowUpMode:
+    """
+    Members:
+    
+      PauseProgram : Pause the program
+    
+      StopProgram : Halt/stop the program flow
+    """
+    PauseProgram: typing.ClassVar[CollisionFollowUpMode]  # value = <CollisionFollowUpMode.PauseProgram: 0>
+    StopProgram: typing.ClassVar[CollisionFollowUpMode]  # value = <CollisionFollowUpMode.StopProgram: 1>
+    __members__: typing.ClassVar[dict[str, CollisionFollowUpMode]]  # value = {'PauseProgram': <CollisionFollowUpMode.PauseProgram: 0>, 'StopProgram': <CollisionFollowUpMode.StopProgram: 1>}
+    def __eq__(self, other: typing.Any) -> bool:
+        ...
+    def __getstate__(self) -> int:
+        ...
+    def __hash__(self) -> int:
+        ...
+    def __index__(self) -> int:
+        ...
+    def __init__(self, value: typing.SupportsInt) -> None:
+        ...
+    def __int__(self) -> int:
+        ...
+    def __ne__(self, other: typing.Any) -> bool:
+        ...
+    def __repr__(self) -> str:
+        ...
+    def __setstate__(self, state: typing.SupportsInt) -> None:
+        ...
+    def __str__(self) -> str:
+        ...
+    @property
+    def name(self) -> str:
+        ...
+    @property
+    def value(self) -> int:
+        ...
+class CollisionMode:
+    """
+    Members:
+    
+      GeneralStop : General Stop
+    
+      EvasionStop : Evasion Stop
+    """
+    EvasionStop: typing.ClassVar[CollisionMode]  # value = <CollisionMode.EvasionStop: 1>
+    GeneralStop: typing.ClassVar[CollisionMode]  # value = <CollisionMode.GeneralStop: 0>
+    __members__: typing.ClassVar[dict[str, CollisionMode]]  # value = {'GeneralStop': <CollisionMode.GeneralStop: 0>, 'EvasionStop': <CollisionMode.EvasionStop: 1>}
+    def __eq__(self, other: typing.Any) -> bool:
+        ...
+    def __getstate__(self) -> int:
+        ...
+    def __hash__(self) -> int:
+        ...
+    def __index__(self) -> int:
+        ...
+    def __init__(self, value: typing.SupportsInt) -> None:
+        ...
+    def __int__(self) -> int:
+        ...
+    def __ne__(self, other: typing.Any) -> bool:
+        ...
+    def __repr__(self) -> str:
+        ...
+    def __setstate__(self, state: typing.SupportsInt) -> None:
+        ...
+    def __str__(self) -> str:
+        ...
+    @property
+    def name(self) -> str:
+        ...
+    @property
+    def value(self) -> int:
+        ...
+class ControlBoxInfo:
+    def __repr__(self) -> str:
+        ...
+    @property
+    def robot_box_type(self) -> int:
+        ...
+    @property
+    def system_version(self) -> int:
+        ...
+class DigitalIOMode:
+    """
+    Members:
+    
+      Bypass : Bypass
+    
+      Low : Low
+    
+      High : High
+    """
+    Bypass: typing.ClassVar[DigitalIOMode]  # value = <DigitalIOMode.Bypass: -1>
+    High: typing.ClassVar[DigitalIOMode]  # value = <DigitalIOMode.High: 1>
+    Low: typing.ClassVar[DigitalIOMode]  # value = <DigitalIOMode.Low: 0>
+    __members__: typing.ClassVar[dict[str, DigitalIOMode]]  # value = {'Bypass': <DigitalIOMode.Bypass: -1>, 'Low': <DigitalIOMode.Low: 0>, 'High': <DigitalIOMode.High: 1>}
+    def __eq__(self, other: typing.Any) -> bool:
+        ...
+    def __getstate__(self) -> int:
+        ...
+    def __hash__(self) -> int:
+        ...
+    def __index__(self) -> int:
+        ...
+    def __init__(self, value: typing.SupportsInt) -> None:
+        ...
+    def __int__(self) -> int:
+        ...
+    def __ne__(self, other: typing.Any) -> bool:
+        ...
+    def __repr__(self) -> str:
+        ...
+    def __setstate__(self, state: typing.SupportsInt) -> None:
+        ...
+    def __str__(self) -> str:
+        ...
+    @property
+    def name(self) -> str:
+        ...
+    @property
+    def value(self) -> int:
+        ...
+class Endian:
+    """
+    Members:
+    
+      LittleEndian
+    
+      BigEndian
+    """
+    BigEndian: typing.ClassVar[Endian]  # value = <Endian.BigEndian: 1>
+    LittleEndian: typing.ClassVar[Endian]  # value = <Endian.LittleEndian: 0>
+    __members__: typing.ClassVar[dict[str, Endian]]  # value = {'LittleEndian': <Endian.LittleEndian: 0>, 'BigEndian': <Endian.BigEndian: 1>}
+    def __eq__(self, other: typing.Any) -> bool:
+        ...
+    def __getstate__(self) -> int:
+        ...
+    def __hash__(self) -> int:
+        ...
+    def __index__(self) -> int:
+        ...
+    def __init__(self, value: typing.SupportsInt) -> None:
+        ...
+    def __int__(self) -> int:
+        ...
+    def __ne__(self, other: typing.Any) -> bool:
+        ...
+    def __repr__(self) -> str:
+        ...
+    def __setstate__(self, state: typing.SupportsInt) -> None:
+        ...
+    def __str__(self) -> str:
+        ...
+    @property
+    def name(self) -> str:
+        ...
+    @property
+    def value(self) -> int:
+        ...
+class GripperConnectionPoint:
+    """
+    Members:
+    
+      ToolFlange
+    
+      ControlBox
+    
+      ToolFlange_Advanced
+    """
+    ControlBox: typing.ClassVar[GripperConnectionPoint]  # value = <GripperConnectionPoint.ControlBox: 1>
+    ToolFlange: typing.ClassVar[GripperConnectionPoint]  # value = <GripperConnectionPoint.ToolFlange: 0>
+    ToolFlange_Advanced: typing.ClassVar[GripperConnectionPoint]  # value = <GripperConnectionPoint.ToolFlange_Advanced: 2>
+    __members__: typing.ClassVar[dict[str, GripperConnectionPoint]]  # value = {'ToolFlange': <GripperConnectionPoint.ToolFlange: 0>, 'ControlBox': <GripperConnectionPoint.ControlBox: 1>, 'ToolFlange_Advanced': <GripperConnectionPoint.ToolFlange_Advanced: 2>}
+    def __eq__(self, other: typing.Any) -> bool:
+        ...
+    def __getstate__(self) -> int:
+        ...
+    def __hash__(self) -> int:
+        ...
+    def __index__(self) -> int:
+        ...
+    def __init__(self, value: typing.SupportsInt) -> None:
+        ...
+    def __int__(self) -> int:
+        ...
+    def __ne__(self, other: typing.Any) -> bool:
+        ...
+    def __repr__(self) -> str:
+        ...
+    def __setstate__(self, state: typing.SupportsInt) -> None:
+        ...
+    def __str__(self) -> str:
+        ...
+    @property
+    def name(self) -> str:
+        ...
+    @property
+    def value(self) -> int:
+        ...
+class GripperModel:
+    """
+    Members:
+    
+      Robotiq_Hand_E
+    
+      Robotiq_2F_85
+    
+      Robotiq_2F1_40
+    
+      Robotiq_E_Pick
+    
+      Robotis_RH_P12_RN
+    
+      JRT_JEGB_4285
+    
+      JRT_JEGB_42140
+    
+      DH_AG_95
+    
+      Setech_NutRunner
+    
+      OnRobot2FG7
+    
+      JRT_JEGG
+    
+      RB_5FDG
+    
+      OnRobot_RG2
+    
+      OnRobot_RG6
+    
+      OnRobot_VG10
+    
+      OnRobot_VGC10
+    
+      OnRobot_3FG15
+    
+      OnRobot_Sander
+    
+      OnRobot_VGP20
+    
+      OnRobot_MG10
+    
+      OnRobot_SoftGripper
+    
+      JRT_JEGC
+    
+      Schunk_Coact
+    
+      Baumer_Laser_Sensor
+    
+      Mighty_12LF
+    
+      JRT_JEGH_3520
+    """
+    Baumer_Laser_Sensor: typing.ClassVar[GripperModel]  # value = <GripperModel.Baumer_Laser_Sensor: 23>
+    DH_AG_95: typing.ClassVar[GripperModel]  # value = <GripperModel.DH_AG_95: 7>
+    JRT_JEGB_42140: typing.ClassVar[GripperModel]  # value = <GripperModel.JRT_JEGB_42140: 6>
+    JRT_JEGB_4285: typing.ClassVar[GripperModel]  # value = <GripperModel.JRT_JEGB_4285: 5>
+    JRT_JEGC: typing.ClassVar[GripperModel]  # value = <GripperModel.JRT_JEGC: 21>
+    JRT_JEGG: typing.ClassVar[GripperModel]  # value = <GripperModel.JRT_JEGG: 10>
+    JRT_JEGH_3520: typing.ClassVar[GripperModel]  # value = <GripperModel.JRT_JEGH_3520: 25>
+    Mighty_12LF: typing.ClassVar[GripperModel]  # value = <GripperModel.Mighty_12LF: 24>
+    OnRobot2FG7: typing.ClassVar[GripperModel]  # value = <GripperModel.OnRobot2FG7: 9>
+    OnRobot_3FG15: typing.ClassVar[GripperModel]  # value = <GripperModel.OnRobot_3FG15: 16>
+    OnRobot_MG10: typing.ClassVar[GripperModel]  # value = <GripperModel.OnRobot_MG10: 19>
+    OnRobot_RG2: typing.ClassVar[GripperModel]  # value = <GripperModel.OnRobot_RG2: 12>
+    OnRobot_RG6: typing.ClassVar[GripperModel]  # value = <GripperModel.OnRobot_RG6: 13>
+    OnRobot_Sander: typing.ClassVar[GripperModel]  # value = <GripperModel.OnRobot_Sander: 17>
+    OnRobot_SoftGripper: typing.ClassVar[GripperModel]  # value = <GripperModel.OnRobot_SoftGripper: 20>
+    OnRobot_VG10: typing.ClassVar[GripperModel]  # value = <GripperModel.OnRobot_VG10: 14>
+    OnRobot_VGC10: typing.ClassVar[GripperModel]  # value = <GripperModel.OnRobot_VGC10: 15>
+    OnRobot_VGP20: typing.ClassVar[GripperModel]  # value = <GripperModel.OnRobot_VGP20: 18>
+    RB_5FDG: typing.ClassVar[GripperModel]  # value = <GripperModel.RB_5FDG: 11>
+    Robotiq_2F1_40: typing.ClassVar[GripperModel]  # value = <GripperModel.Robotiq_2F1_40: 2>
+    Robotiq_2F_85: typing.ClassVar[GripperModel]  # value = <GripperModel.Robotiq_2F_85: 1>
+    Robotiq_E_Pick: typing.ClassVar[GripperModel]  # value = <GripperModel.Robotiq_E_Pick: 3>
+    Robotiq_Hand_E: typing.ClassVar[GripperModel]  # value = <GripperModel.Robotiq_Hand_E: 0>
+    Robotis_RH_P12_RN: typing.ClassVar[GripperModel]  # value = <GripperModel.Robotis_RH_P12_RN: 4>
+    Schunk_Coact: typing.ClassVar[GripperModel]  # value = <GripperModel.Schunk_Coact: 22>
+    Setech_NutRunner: typing.ClassVar[GripperModel]  # value = <GripperModel.Setech_NutRunner: 8>
+    __members__: typing.ClassVar[dict[str, GripperModel]]  # value = {'Robotiq_Hand_E': <GripperModel.Robotiq_Hand_E: 0>, 'Robotiq_2F_85': <GripperModel.Robotiq_2F_85: 1>, 'Robotiq_2F1_40': <GripperModel.Robotiq_2F1_40: 2>, 'Robotiq_E_Pick': <GripperModel.Robotiq_E_Pick: 3>, 'Robotis_RH_P12_RN': <GripperModel.Robotis_RH_P12_RN: 4>, 'JRT_JEGB_4285': <GripperModel.JRT_JEGB_4285: 5>, 'JRT_JEGB_42140': <GripperModel.JRT_JEGB_42140: 6>, 'DH_AG_95': <GripperModel.DH_AG_95: 7>, 'Setech_NutRunner': <GripperModel.Setech_NutRunner: 8>, 'OnRobot2FG7': <GripperModel.OnRobot2FG7: 9>, 'JRT_JEGG': <GripperModel.JRT_JEGG: 10>, 'RB_5FDG': <GripperModel.RB_5FDG: 11>, 'OnRobot_RG2': <GripperModel.OnRobot_RG2: 12>, 'OnRobot_RG6': <GripperModel.OnRobot_RG6: 13>, 'OnRobot_VG10': <GripperModel.OnRobot_VG10: 14>, 'OnRobot_VGC10': <GripperModel.OnRobot_VGC10: 15>, 'OnRobot_3FG15': <GripperModel.OnRobot_3FG15: 16>, 'OnRobot_Sander': <GripperModel.OnRobot_Sander: 17>, 'OnRobot_VGP20': <GripperModel.OnRobot_VGP20: 18>, 'OnRobot_MG10': <GripperModel.OnRobot_MG10: 19>, 'OnRobot_SoftGripper': <GripperModel.OnRobot_SoftGripper: 20>, 'JRT_JEGC': <GripperModel.JRT_JEGC: 21>, 'Schunk_Coact': <GripperModel.Schunk_Coact: 22>, 'Baumer_Laser_Sensor': <GripperModel.Baumer_Laser_Sensor: 23>, 'Mighty_12LF': <GripperModel.Mighty_12LF: 24>, 'JRT_JEGH_3520': <GripperModel.JRT_JEGH_3520: 25>}
+    def __eq__(self, other: typing.Any) -> bool:
+        ...
+    def __getstate__(self) -> int:
+        ...
+    def __hash__(self) -> int:
+        ...
+    def __index__(self) -> int:
+        ...
+    def __init__(self, value: typing.SupportsInt) -> None:
+        ...
+    def __int__(self) -> int:
+        ...
+    def __ne__(self, other: typing.Any) -> bool:
+        ...
+    def __repr__(self) -> str:
+        ...
+    def __setstate__(self, state: typing.SupportsInt) -> None:
+        ...
+    def __str__(self) -> str:
+        ...
+    @property
+    def name(self) -> str:
+        ...
+    @property
+    def value(self) -> int:
+        ...
+class Message:
+    def __repr__(self) -> str:
+        ...
+    @property
+    def en(self) -> str:
+        ...
+    @property
+    def ko(self) -> str:
+        ...
+class MoveCOrientationOption:
+    """
+    Members:
+    
+      Intended : Intended (Follows the rotation value taught by the user)
+    
+      Constant : Constant (Keep the rotation value of the starting position)
+    
+      Radial : Radial (Rotate the TCP according to the rotation of the circle)
+    
+      Smooth : Smooth (Similar to Intended, but with a smooth rate of rotation change)
+    """
+    Constant: typing.ClassVar[MoveCOrientationOption]  # value = <MoveCOrientationOption.Constant: 1>
+    Intended: typing.ClassVar[MoveCOrientationOption]  # value = <MoveCOrientationOption.Intended: 0>
+    Radial: typing.ClassVar[MoveCOrientationOption]  # value = <MoveCOrientationOption.Radial: 2>
+    Smooth: typing.ClassVar[MoveCOrientationOption]  # value = <MoveCOrientationOption.Smooth: 3>
+    __members__: typing.ClassVar[dict[str, MoveCOrientationOption]]  # value = {'Intended': <MoveCOrientationOption.Intended: 0>, 'Constant': <MoveCOrientationOption.Constant: 1>, 'Radial': <MoveCOrientationOption.Radial: 2>, 'Smooth': <MoveCOrientationOption.Smooth: 3>}
+    def __eq__(self, other: typing.Any) -> bool:
+        ...
+    def __getstate__(self) -> int:
+        ...
+    def __hash__(self) -> int:
+        ...
+    def __index__(self) -> int:
+        ...
+    def __init__(self, value: typing.SupportsInt) -> None:
+        ...
+    def __int__(self) -> int:
+        ...
+    def __ne__(self, other: typing.Any) -> bool:
+        ...
+    def __repr__(self) -> str:
+        ...
+    def __setstate__(self, state: typing.SupportsInt) -> None:
+        ...
+    def __str__(self) -> str:
+        ...
+    @property
+    def name(self) -> str:
+        ...
+    @property
+    def value(self) -> int:
+        ...
+class MoveCRotationOption:
+    """
+    Members:
+    
+      Intended : Intended (rotate the same way as the Constant below.)
+    
+      Constant : Constant (Keep the rotation value of the starting position)
+    
+      Radial : Radial (Rotate the TCP according to the rotation of the circle)
+    """
+    Constant: typing.ClassVar[MoveCRotationOption]  # value = <MoveCRotationOption.Constant: 1>
+    Intended: typing.ClassVar[MoveCRotationOption]  # value = <MoveCRotationOption.Intended: 0>
+    Radial: typing.ClassVar[MoveCRotationOption]  # value = <MoveCRotationOption.Radial: 2>
+    __members__: typing.ClassVar[dict[str, MoveCRotationOption]]  # value = {'Intended': <MoveCRotationOption.Intended: 0>, 'Constant': <MoveCRotationOption.Constant: 1>, 'Radial': <MoveCRotationOption.Radial: 2>}
+    def __eq__(self, other: typing.Any) -> bool:
+        ...
+    def __getstate__(self) -> int:
+        ...
+    def __hash__(self) -> int:
+        ...
+    def __index__(self) -> int:
+        ...
+    def __init__(self, value: typing.SupportsInt) -> None:
+        ...
+    def __int__(self) -> int:
+        ...
+    def __ne__(self, other: typing.Any) -> bool:
+        ...
+    def __repr__(self) -> str:
+        ...
+    def __setstate__(self, state: typing.SupportsInt) -> None:
+        ...
+    def __str__(self) -> str:
+        ...
+    @property
+    def name(self) -> str:
+        ...
+    @property
+    def value(self) -> int:
+        ...
+class MoveITPLOption:
+    """
+    Members:
+    
+      Intended : Intended (Follows the rotation value taught by the user)
+    
+      Constant : Constant (Keep the rotation value of the starting position)
+    
+      Smooth : Smooth (Similar to Intended, but with a smooth rate of rotation change)
+    
+      CAIntended : CA-Intended (CA mode Intended)
+    
+      CAConstant : CA-Constant (CA mode Constant)
+    
+      CASmooth : CA-Smooth (CA mode Smooth)
+    """
+    CAConstant: typing.ClassVar[MoveITPLOption]  # value = <MoveITPLOption.CAConstant: 6>
+    CAIntended: typing.ClassVar[MoveITPLOption]  # value = <MoveITPLOption.CAIntended: 5>
+    CASmooth: typing.ClassVar[MoveITPLOption]  # value = <MoveITPLOption.CASmooth: 8>
+    Constant: typing.ClassVar[MoveITPLOption]  # value = <MoveITPLOption.Constant: 1>
+    Intended: typing.ClassVar[MoveITPLOption]  # value = <MoveITPLOption.Intended: 0>
+    Smooth: typing.ClassVar[MoveITPLOption]  # value = <MoveITPLOption.Smooth: 3>
+    __members__: typing.ClassVar[dict[str, MoveITPLOption]]  # value = {'Intended': <MoveITPLOption.Intended: 0>, 'Constant': <MoveITPLOption.Constant: 1>, 'Smooth': <MoveITPLOption.Smooth: 3>, 'CAIntended': <MoveITPLOption.CAIntended: 5>, 'CAConstant': <MoveITPLOption.CAConstant: 6>, 'CASmooth': <MoveITPLOption.CASmooth: 8>}
+    def __eq__(self, other: typing.Any) -> bool:
+        ...
+    def __getstate__(self) -> int:
+        ...
+    def __hash__(self) -> int:
+        ...
+    def __index__(self) -> int:
+        ...
+    def __init__(self, value: typing.SupportsInt) -> None:
+        ...
+    def __int__(self) -> int:
+        ...
+    def __ne__(self, other: typing.Any) -> bool:
+        ...
+    def __repr__(self) -> str:
+        ...
+    def __setstate__(self, state: typing.SupportsInt) -> None:
+        ...
+    def __str__(self) -> str:
+        ...
+    @property
+    def name(self) -> str:
+        ...
+    @property
+    def value(self) -> int:
+        ...
+class MoveLBOption:
+    """
+    Members:
+    
+      Intended : Intended (Follows the rotation value taught by the user)
+    
+      Constant : Constant (Keep the rotation value of the starting position)
+    """
+    Constant: typing.ClassVar[MoveLBOption]  # value = <MoveLBOption.Constant: 1>
+    Intended: typing.ClassVar[MoveLBOption]  # value = <MoveLBOption.Intended: 0>
+    __members__: typing.ClassVar[dict[str, MoveLBOption]]  # value = {'Intended': <MoveLBOption.Intended: 0>, 'Constant': <MoveLBOption.Constant: 1>}
+    def __eq__(self, other: typing.Any) -> bool:
+        ...
+    def __getstate__(self) -> int:
+        ...
+    def __hash__(self) -> int:
+        ...
+    def __index__(self) -> int:
+        ...
+    def __init__(self, value: typing.SupportsInt) -> None:
+        ...
+    def __int__(self) -> int:
+        ...
+    def __ne__(self, other: typing.Any) -> bool:
+        ...
+    def __repr__(self) -> str:
+        ...
+    def __setstate__(self, state: typing.SupportsInt) -> None:
+        ...
+    def __str__(self) -> str:
+        ...
+    @property
+    def name(self) -> str:
+        ...
+    @property
+    def value(self) -> int:
+        ...
+class MoveLCOption:
+    """
+    Members:
+    
+      Intended : Intended (Follows the rotation value taught by the user)
+    
+      Constant : Constant (Keep the rotation value of the starting position)
+    
+      Smooth : Smooth (Similar to Intended, but with a smooth rate of rotation change)
+    """
+    Constant: typing.ClassVar[MoveLCOption]  # value = <MoveLCOption.Constant: 1>
+    Intended: typing.ClassVar[MoveLCOption]  # value = <MoveLCOption.Intended: 0>
+    Smooth: typing.ClassVar[MoveLCOption]  # value = <MoveLCOption.Smooth: 3>
+    __members__: typing.ClassVar[dict[str, MoveLCOption]]  # value = {'Intended': <MoveLCOption.Intended: 0>, 'Constant': <MoveLCOption.Constant: 1>, 'Smooth': <MoveLCOption.Smooth: 3>}
+    def __eq__(self, other: typing.Any) -> bool:
+        ...
+    def __getstate__(self) -> int:
+        ...
+    def __hash__(self) -> int:
+        ...
+    def __index__(self) -> int:
+        ...
+    def __init__(self, value: typing.SupportsInt) -> None:
+        ...
+    def __int__(self) -> int:
+        ...
+    def __ne__(self, other: typing.Any) -> bool:
+        ...
+    def __repr__(self) -> str:
+        ...
+    def __setstate__(self, state: typing.SupportsInt) -> None:
+        ...
+    def __str__(self) -> str:
+        ...
+    @property
+    def name(self) -> str:
+        ...
+    @property
+    def value(self) -> int:
+        ...
+class MoveLCProperty:
+    """
+    Members:
+    
+      LinearMotion : Pass through linear motion
+    
+      CircularMotion : Pass through circular motion
+    """
+    CircularMotion: typing.ClassVar[MoveLCProperty]  # value = <MoveLCProperty.CircularMotion: 1>
+    LinearMotion: typing.ClassVar[MoveLCProperty]  # value = <MoveLCProperty.LinearMotion: 0>
+    __members__: typing.ClassVar[dict[str, MoveLCProperty]]  # value = {'LinearMotion': <MoveLCProperty.LinearMotion: 0>, 'CircularMotion': <MoveLCProperty.CircularMotion: 1>}
+    def __eq__(self, other: typing.Any) -> bool:
+        ...
+    def __getstate__(self) -> int:
+        ...
+    def __hash__(self) -> int:
+        ...
+    def __index__(self) -> int:
+        ...
+    def __init__(self, value: typing.SupportsInt) -> None:
+        ...
+    def __int__(self) -> int:
+        ...
+    def __ne__(self, other: typing.Any) -> bool:
+        ...
+    def __repr__(self) -> str:
+        ...
+    def __setstate__(self, state: typing.SupportsInt) -> None:
+        ...
+    def __str__(self) -> str:
+        ...
+    @property
+    def name(self) -> str:
+        ...
+    @property
+    def value(self) -> int:
+        ...
+class MovePBOption:
+    """
+    Members:
+    
+      Intended : Intended (Follows the rotation value taught by the user)
+    
+      Constant : Constant (Keep the rotation value of the starting position)
+    
+      Smooth : Smooth (Similar to Intended, but with a smooth rate of rotation change)
+    """
+    Constant: typing.ClassVar[MovePBOption]  # value = <MovePBOption.Constant: 1>
+    Intended: typing.ClassVar[MovePBOption]  # value = <MovePBOption.Intended: 0>
+    Smooth: typing.ClassVar[MovePBOption]  # value = <MovePBOption.Smooth: 3>
+    __members__: typing.ClassVar[dict[str, MovePBOption]]  # value = {'Intended': <MovePBOption.Intended: 0>, 'Constant': <MovePBOption.Constant: 1>, 'Smooth': <MovePBOption.Smooth: 3>}
+    def __eq__(self, other: typing.Any) -> bool:
+        ...
+    def __getstate__(self) -> int:
+        ...
+    def __hash__(self) -> int:
+        ...
+    def __index__(self) -> int:
+        ...
+    def __init__(self, value: typing.SupportsInt) -> None:
+        ...
+    def __int__(self) -> int:
+        ...
+    def __ne__(self, other: typing.Any) -> bool:
+        ...
+    def __repr__(self) -> str:
+        ...
+    def __setstate__(self, state: typing.SupportsInt) -> None:
+        ...
+    def __str__(self) -> str:
+        ...
+    @property
+    def name(self) -> str:
+        ...
+    @property
+    def value(self) -> int:
+        ...
+class MoveServoTOption:
+    """
+    Members:
+    
+      NoCompensation
+    
+      GravityCompensation
+    
+      FrictionCompensation
+    """
+    FrictionCompensation: typing.ClassVar[MoveServoTOption]  # value = <MoveServoTOption.FrictionCompensation: 2>
+    GravityCompensation: typing.ClassVar[MoveServoTOption]  # value = <MoveServoTOption.GravityCompensation: 1>
+    NoCompensation: typing.ClassVar[MoveServoTOption]  # value = <MoveServoTOption.NoCompensation: 0>
+    __members__: typing.ClassVar[dict[str, MoveServoTOption]]  # value = {'NoCompensation': <MoveServoTOption.NoCompensation: 0>, 'GravityCompensation': <MoveServoTOption.GravityCompensation: 1>, 'FrictionCompensation': <MoveServoTOption.FrictionCompensation: 2>}
+    def __eq__(self, other: typing.Any) -> bool:
+        ...
+    def __getstate__(self) -> int:
+        ...
+    def __hash__(self) -> int:
+        ...
+    def __index__(self) -> int:
+        ...
+    def __init__(self, value: typing.SupportsInt) -> None:
+        ...
+    def __int__(self) -> int:
+        ...
+    def __ne__(self, other: typing.Any) -> bool:
+        ...
+    def __repr__(self) -> str:
+        ...
+    def __setstate__(self, state: typing.SupportsInt) -> None:
+        ...
+    def __str__(self) -> str:
+        ...
+    @property
+    def name(self) -> str:
+        ...
+    @property
+    def value(self) -> int:
+        ...
+class OperationMode:
+    """
+    Members:
+    
+      Real
+    
+      Simulation
+    """
+    Real: typing.ClassVar[OperationMode]  # value = <OperationMode.Real: 0>
+    Simulation: typing.ClassVar[OperationMode]  # value = <OperationMode.Simulation: 1>
+    __members__: typing.ClassVar[dict[str, OperationMode]]  # value = {'Real': <OperationMode.Real: 0>, 'Simulation': <OperationMode.Simulation: 1>}
+    def __eq__(self, other: typing.Any) -> bool:
+        ...
+    def __getstate__(self) -> int:
+        ...
+    def __hash__(self) -> int:
+        ...
+    def __index__(self) -> int:
+        ...
+    def __init__(self, value: typing.SupportsInt) -> None:
+        ...
+    def __int__(self) -> int:
+        ...
+    def __ne__(self, other: typing.Any) -> bool:
+        ...
+    def __repr__(self) -> str:
+        ...
+    def __setstate__(self, state: typing.SupportsInt) -> None:
+        ...
+    def __str__(self) -> str:
+        ...
+    @property
+    def name(self) -> str:
+        ...
+    @property
+    def value(self) -> int:
+        ...
+class ReferenceFrame:
+    """
+    Members:
+    
+      Base : Base (Global) coordinate
+    
+      Tool : Tool (Local) coordinate
+    
+      User0 : User coordinate 0
+    
+      User1 : User coordinate 1
+    
+      User2 : User coordinate 2
+    """
+    Base: typing.ClassVar[ReferenceFrame]  # value = <ReferenceFrame.Base: 0>
+    Tool: typing.ClassVar[ReferenceFrame]  # value = <ReferenceFrame.Tool: 1>
+    User0: typing.ClassVar[ReferenceFrame]  # value = <ReferenceFrame.User0: 2>
+    User1: typing.ClassVar[ReferenceFrame]  # value = <ReferenceFrame.User1: 3>
+    User2: typing.ClassVar[ReferenceFrame]  # value = <ReferenceFrame.User2: 4>
+    __members__: typing.ClassVar[dict[str, ReferenceFrame]]  # value = {'Base': <ReferenceFrame.Base: 0>, 'Tool': <ReferenceFrame.Tool: 1>, 'User0': <ReferenceFrame.User0: 2>, 'User1': <ReferenceFrame.User1: 3>, 'User2': <ReferenceFrame.User2: 4>}
+    def __eq__(self, other: typing.Any) -> bool:
+        ...
+    def __getstate__(self) -> int:
+        ...
+    def __hash__(self) -> int:
+        ...
+    def __index__(self) -> int:
+        ...
+    def __init__(self, value: typing.SupportsInt) -> None:
+        ...
+    def __int__(self) -> int:
+        ...
+    def __ne__(self, other: typing.Any) -> bool:
+        ...
+    def __repr__(self) -> str:
+        ...
+    def __setstate__(self, state: typing.SupportsInt) -> None:
+        ...
+    def __str__(self) -> str:
+        ...
+    @property
+    def name(self) -> str:
+        ...
+    @property
+    def value(self) -> int:
+        ...
+class Response:
+    class Type:
+        """
+        Members:
+        
+          ACK
+        
+          Info
+        
+          Warn
+        
+          Error
+        
+          Unknown
+        """
+        ACK: typing.ClassVar[Response.Type]  # value = <Type.ACK: 0>
+        Error: typing.ClassVar[Response.Type]  # value = <Type.Error: 3>
+        Info: typing.ClassVar[Response.Type]  # value = <Type.Info: 1>
+        Unknown: typing.ClassVar[Response.Type]  # value = <Type.Unknown: 4>
+        Warn: typing.ClassVar[Response.Type]  # value = <Type.Warn: 2>
+        __members__: typing.ClassVar[dict[str, Response.Type]]  # value = {'ACK': <Type.ACK: 0>, 'Info': <Type.Info: 1>, 'Warn': <Type.Warn: 2>, 'Error': <Type.Error: 3>, 'Unknown': <Type.Unknown: 4>}
+        def __eq__(self, other: typing.Any) -> bool:
+            ...
+        def __getstate__(self) -> int:
+            ...
+        def __hash__(self) -> int:
+            ...
+        def __index__(self) -> int:
+            ...
+        def __init__(self, value: typing.SupportsInt) -> None:
+            ...
+        def __int__(self) -> int:
+            ...
+        def __ne__(self, other: typing.Any) -> bool:
+            ...
+        def __repr__(self) -> str:
+            ...
+        def __setstate__(self, state: typing.SupportsInt) -> None:
+            ...
+        def __str__(self) -> str:
+            ...
+        @property
+        def name(self) -> str:
+            ...
+        @property
+        def value(self) -> int:
+            ...
+    def __repr__(self) -> str:
+        ...
+    def category(self) -> str:
+        ...
+    def msg(self) -> str:
+        ...
+    def raw(self) -> str:
+        ...
+    def type(self) -> Response.Type:
+        ...
+class ResponseCollector:
+    class ConfigFlag:
+        """
+        Members:
+        
+          Default
+        
+          EnableCheckOldResponses
+        
+          RemoveAckAutomatically
+        """
+        Default: typing.ClassVar[ResponseCollector.ConfigFlag]  # value = <ConfigFlag.Default: 2>
+        EnableCheckOldResponses: typing.ClassVar[ResponseCollector.ConfigFlag]  # value = <ConfigFlag.EnableCheckOldResponses: 1>
+        RemoveAckAutomatically: typing.ClassVar[ResponseCollector.ConfigFlag]  # value = <ConfigFlag.Default: 2>
+        __members__: typing.ClassVar[dict[str, ResponseCollector.ConfigFlag]]  # value = {'Default': <ConfigFlag.Default: 2>, 'EnableCheckOldResponses': <ConfigFlag.EnableCheckOldResponses: 1>, 'RemoveAckAutomatically': <ConfigFlag.Default: 2>}
+        def __eq__(self, other: typing.Any) -> bool:
+            ...
+        def __getstate__(self) -> int:
+            ...
+        def __hash__(self) -> int:
+            ...
+        def __index__(self) -> int:
+            ...
+        def __init__(self, value: typing.SupportsInt) -> None:
+            ...
+        def __int__(self) -> int:
+            ...
+        def __ne__(self, other: typing.Any) -> bool:
+            ...
+        def __repr__(self) -> str:
+            ...
+        def __setstate__(self, state: typing.SupportsInt) -> None:
+            ...
+        def __str__(self) -> str:
+            ...
+        @property
+        def name(self) -> str:
+            ...
+        @property
+        def value(self) -> int:
+            ...
+    def __init__(self, flag: typing.SupportsInt = 2) -> None:
+        ...
+    def __iter__(self) -> collections.abc.Iterator[Response]:
+        ...
+    def __len__(self) -> int:
+        ...
+    def __repr__(self) -> str:
+        ...
+    def ack(self, remain: bool = False) -> ResponseCollector:
+        ...
+    def add(self, response: Response) -> None:
+        ...
+    def category_filter(self, filter: str, remain: bool = False) -> ResponseCollector:
+        ...
+    def clear(self) -> None:
+        ...
+    def clear_callback(self) -> None:
+        ...
+    def error(self, remain: bool = False) -> ResponseCollector:
+        ...
+    def flag(self) -> int:
+        ...
+    def has_error(self) -> bool:
+        ...
+    def info(self, remain: bool = False) -> ResponseCollector:
+        ...
+    def set_callback(self, callback: collections.abc.Callable[[Response], None]) -> None:
+        ...
+    def set_flag(self, arg0: typing.SupportsInt) -> None:
+        ...
+    def throw_if_not_empty(self) -> ResponseCollector:
+        ...
+    def type_filter(self, type: Response.Type, remain: bool = False) -> ResponseCollector:
+        ...
+    def warn(self, remain: bool = False) -> ResponseCollector:
+        ...
+class ReturnType:
+    class Type:
+        """
+        Members:
+        
+          Undefined
+        
+          Success
+        
+          Timeout
+        
+          Error
+        """
+        Error: typing.ClassVar[ReturnType.Type]  # value = <Type.Error: 3>
+        Success: typing.ClassVar[ReturnType.Type]  # value = <Type.Success: 1>
+        Timeout: typing.ClassVar[ReturnType.Type]  # value = <Type.Timeout: 2>
+        Undefined: typing.ClassVar[ReturnType.Type]  # value = <Type.Undefined: 0>
+        __members__: typing.ClassVar[dict[str, ReturnType.Type]]  # value = {'Undefined': <Type.Undefined: 0>, 'Success': <Type.Success: 1>, 'Timeout': <Type.Timeout: 2>, 'Error': <Type.Error: 3>}
+        def __eq__(self, other: typing.Any) -> bool:
+            ...
+        def __getstate__(self) -> int:
+            ...
+        def __hash__(self) -> int:
+            ...
+        def __index__(self) -> int:
+            ...
+        def __init__(self, value: typing.SupportsInt) -> None:
+            ...
+        def __int__(self) -> int:
+            ...
+        def __ne__(self, other: typing.Any) -> bool:
+            ...
+        def __repr__(self) -> str:
+            ...
+        def __setstate__(self, state: typing.SupportsInt) -> None:
+            ...
+        def __str__(self) -> str:
+            ...
+        @property
+        def name(self) -> str:
+            ...
+        @property
+        def value(self) -> int:
+            ...
+    Error: typing.ClassVar[ReturnType.Type]  # value = <Type.Error: 3>
+    Success: typing.ClassVar[ReturnType.Type]  # value = <Type.Success: 1>
+    Timeout: typing.ClassVar[ReturnType.Type]  # value = <Type.Timeout: 2>
+    Undefined: typing.ClassVar[ReturnType.Type]  # value = <Type.Undefined: 0>
+    def __init__(self, type: ReturnType.Type, remain_time: typing.SupportsFloat) -> None:
+        ...
+    def __repr__(self) -> str:
+        ...
+    def is_error(self) -> bool:
+        ...
+    def is_success(self) -> bool:
+        ...
+    def is_timeout(self) -> bool:
+        ...
+    def remain_time(self) -> float:
+        ...
+    def set_remain_time(self, remain_time: typing.SupportsFloat) -> None:
+        ...
+    def type(self) -> ReturnType.Type:
+        ...
+class RobotState:
+    """
+    Members:
+    
+      Unknown
+    
+      Idle
+    
+      Moving
+    """
+    Idle: typing.ClassVar[RobotState]  # value = <RobotState.Idle: 1>
+    Moving: typing.ClassVar[RobotState]  # value = <RobotState.Moving: 2>
+    Unknown: typing.ClassVar[RobotState]  # value = <RobotState.Unknown: 0>
+    __members__: typing.ClassVar[dict[str, RobotState]]  # value = {'Unknown': <RobotState.Unknown: 0>, 'Idle': <RobotState.Idle: 1>, 'Moving': <RobotState.Moving: 2>}
+    def __eq__(self, other: typing.Any) -> bool:
+        ...
+    def __getstate__(self) -> int:
+        ...
+    def __hash__(self) -> int:
+        ...
+    def __index__(self) -> int:
+        ...
+    def __init__(self, value: typing.SupportsInt) -> None:
+        ...
+    def __int__(self) -> int:
+        ...
+    def __ne__(self, other: typing.Any) -> bool:
+        ...
+    def __repr__(self) -> str:
+        ...
+    def __setstate__(self, state: typing.SupportsInt) -> None:
+        ...
+    def __str__(self) -> str:
+        ...
+    @property
+    def name(self) -> str:
+        ...
+    @property
+    def value(self) -> int:
+        ...
+class SystemState:
+    class Data:
+        @property
+        def aa_joint_ref(self) -> numpy.typing.NDArray[numpy.float32]:
+            """
+            Reference angle of each external-joint (auxiliary joint). (unit: degree)
+            
+            External joint number: 0~5
+            """
+        @property
+        def analog_in(self) -> numpy.typing.NDArray[numpy.float32]:
+            """
+            Control box analog input measurement information of each channel (unit: Voltage)
+            
+            Channel number: 0~3
+            """
+        @property
+        def analog_out(self) -> numpy.typing.NDArray[numpy.float32]:
+            """
+            Control box analog output information of each channel (unit: Voltage)
+            
+            Channel number: 0~3
+            """
+        @property
+        def collision_detect_onoff(self) -> int:
+            """
+            Out collision detection On/Off State (1=On / 0 = Off)
+            """
+        @property
+        def default_speed(self) -> float:
+            """
+            Default speed multiplier value of robot motion (=speed bar in UI) (value: 0 ~ 1)
+            """
+        @property
+        def digital_in(self) -> numpy.typing.NDArray[numpy.int32]:
+            """
+            Control box digital input measurement information of each channel (value: 0 or 1)
+            
+            Channel number: 0~15
+            """
+        @property
+        def digital_out(self) -> numpy.typing.NDArray[numpy.int32]:
+            """
+            Control box digital output information of each channel (value: 0 or 1)
+            
+            Channel number: 0~15
+            """
+        @property
+        def eft_fx(self) -> float:
+            """
+            External F/T force sensor value. Fx (Unit: N)
+            """
+        @property
+        def eft_fy(self) -> float:
+            """
+            External F/T force sensor value. Fy (Unit: N)
+            """
+        @property
+        def eft_fz(self) -> float:
+            """
+            External F/T force sensor value. Fz (Unit: N)
+            """
+        @property
+        def eft_mx(self) -> float:
+            """
+            External F/T torque sensor value. Mx (Unit: Nm)
+            """
+        @property
+        def eft_my(self) -> float:
+            """
+            External F/T torque sensor value. My (Unit: Nm)
+            """
+        @property
+        def eft_mz(self) -> float:
+            """
+            External F/T torque sensor value. Mz (Unit: Nm)
+            """
+        @property
+        def extend_io1_analog_in(self) -> numpy.typing.NDArray[numpy.float32]:
+            """
+            Extended I/O board analog input measurement information of each channel (unit: Voltage)
+            
+            Channel number: 0~3
+            """
+        @property
+        def extend_io1_analog_out(self) -> numpy.typing.NDArray[numpy.float32]:
+            """
+            Extended I/O board analog output information of each channel (unit: Voltage)
+            
+            Channel number: 0~3
+            """
+        @property
+        def extend_io1_digital_info(self) -> int:
+            """
+            Extended I/O board digital input/output information. It consists of a combination of bits
+            
+            * (extend_io1_digital_info >> 0) & 0b01 = Extend I/O digital input # 0
+            * (extend_io1_digital_info >> 1) & 0b01 = Extend I/O digital input # 1
+            * ..
+            * (extend_io1_digital_info >> 15) & 0b01 = Extend I/O digital input # 15
+            * (extend_io1_digital_info >> 16) & 0b01 = Extend I/O digital output # 0
+            * (extend_io1_digital_info >> 17) & 0b01 = Extend I/O digital output # 1
+            * ..
+            * (extend_io1_digital_info >> 31) & 0b01 = Extend I/O digital input # 15
+            """
+        @property
+        def inbox_check_mode(self) -> numpy.typing.NDArray[numpy.int32]:
+            """
+            Check-function mode of Inbox #.
+            
+            # = In Box number: 0 or 1
+            0 = None / 1 = Check Tool Flange center / 2 = Check TCP / 3 = Check Tool Box / 4 = Check all
+            """
+        @property
+        def inbox_trap_flag(self) -> numpy.typing.NDArray[numpy.int32]:
+            """
+            Whether or not detected by the Inbox # check-function.
+            
+            # = In Box number: 0 or 1
+            """
+        @property
+        def information_chunk_1(self) -> int:
+            """
+            Information chunk to deliver various state information (power and others). It consists of a combination of bits.
+            
+            * (information_chunk_1 >> 0) & 0b01 = Control Box's 48V input state
+            * (information_chunk_1 >> 1) & 0b01 = Control Box's 48V output state
+            * (information_chunk_1 >> 2) & 0b01 = Control Box's 24V input state
+            * (information_chunk_1 >> 3) & 0b01 = Control Box's E-Stop state 1
+            * (information_chunk_1 >> 4) & 0b01 = Control Box's User Switch state
+            * (information_chunk_1 >> 5) & 0b01 = Control Box's E-Stop state 2
+            * (information_chunk_1 >> 6) & 0b01 = Whether power is applied to the robot arm
+            * (information_chunk_1 >> 7) & 0b01 = TFB’s Direct teaching button is pressed
+            * (information_chunk_1 >> 30) & 0b01 = Program Load state
+            * (Whenever the Program load process is successful, 1 and 0 are continuously converted.)
+            * (information_chunk_1 >> 31) & 0b01 = Program Transmit state (via TCP/IP Tablet UI, not for user)
+            """
+        @property
+        def information_chunk_2(self) -> int:
+            """
+            Information chunk to deliver various state information. It consists of a combination of bits.
+            
+            * (information_chunk_2 >> 0) & 0b11 = Config digital input 16 (0 or 1) (Not for user)
+            * (information_chunk_2 >> 2) & 0b1111111111111111 = Target welding voltage * 100
+            """
+        @property
+        def information_chunk_3(self) -> int:
+            """
+            Information chunk to deliver various state information. It consists of a combination of bits.
+            
+            * (information_chunk_3 >> 0) & 0b11 = Config digital input 17 (0 or 1) (Not for user)
+            """
+        @property
+        def information_chunk_4(self) -> int:
+            """
+            Information chunk to deliver various state information. It consists of a combination of bits.
+            
+            * (information_chunk_4 >> 0) & 0b11 = No-Arc Function On/Off (0 or 1)
+            * (information_chunk_4 >> 2) & 0b111111 = Selected Tool List number
+            * (information_chunk_4 >> 8) & 0b11 = External Joint (External axis) Jog On/Off (0 or 1)
+            * (information_chunk_4 >> 10) & 0b01 = Tool Flange Digital Input 2
+            * (information_chunk_4 >> 11) & 0b01 = Tool Flange Digital Input 3
+            * (information_chunk_4 >> 12) & 0b01 = Tool Flange Digital Input 4
+            * (information_chunk_4 >> 13) & 0b01 = Tool Flange Digital Input 5
+            * (information_chunk_4 >> 14) & 0b01 = Arc Light On state (Not for user)
+            * (information_chunk_4 >> 15) & 0b1111111111111 = Target welding current * 10
+            * (information_chunk_4 >> 28) & 0b11 = Target welding voltage option (0 or 1)
+            """
+        @property
+        def init_error(self) -> int:
+            """
+            Error code during the arm activation (return value for UI)
+            """
+        @property
+        def init_state_info(self) -> int:
+            """
+            Robot arm activation (Initialization) stage info (0 -> 6)
+            
+            * 0: default
+            * 1: Power check
+            * 2: Device check
+            * 3: Servo Initialization check
+            * 4: Parameter check
+            * 5: Payload check
+            * 6: Activation done
+            """
+        @property
+        def is_freedrive_mode(self) -> int:
+            """
+            Free-drive (Gravity-compensation) On/Off State (1=On / 0 = Off)
+            """
+        @property
+        def jnt_ang(self) -> numpy.typing.NDArray[numpy.float32]:
+            """
+            Measured joint position. (Unit: deg)
+            
+            0 = Base / 1 = Shoulder / 2 = Elbow / 3 = Wrist1 / 4 = Wrist2 / 5 = Wrist3
+            
+            These values do not change in simulation mode.
+            """
+        @property
+        def jnt_cur(self) -> numpy.typing.NDArray[numpy.float32]:
+            """
+            Measured joint current. (Unit: Amp)
+            
+            0 = Base / 1 = Shoulder / 2 = Elbow / 3 = Wrist1 / 4 = Wrist2 / 5 = Wrist3
+            
+            Note
+            ----
+            You can get joint torque by multiplying torque constant.
+            """
+        @property
+        def jnt_info(self) -> numpy.typing.NDArray[numpy.int32]:
+            """
+            Basic state of each joint.
+            
+            0 = Base / 1 = Shoulder / 2 = Elbow / 3 = Wrist1 / 4 = Wrist2 / 5 = Wrist3
+            
+            * Each int (4byte) consists of a combination of bits.
+            * (jnt_info[#] >> 0) & 0b01 = Joint #'s FET state
+            * (jnt_info[#] >> 1) & 0b01 = Joint #'s RUN state
+            * (jnt_info[#] >> 2) & 0b01 = Joint #'s INIT state
+            * (jnt_info[#] >> 3) & 0b01 = Joint #'s MODE state
+            * (jnt_info[#] >> 4) & 0b01 = Joint #'s encoder state (Nonius err)
+            * (jnt_info[#] >> 5) & 0b01 = Joint #'s encoder state (LowBatt err)
+            * (jnt_info[#] >> 6) & 0b01 = Joint #'s encoder state (Calibration mode)
+            * (jnt_info[#] >> 7) & 0b01 = Joint #'s encoder state (Multi-turn err)
+            * (jnt_info[#] >> 8) & 0b01 = Joint #'s Error state (JAM err)
+            * (jnt_info[#] >> 9) & 0b01 = Joint #'s Error state (CUR err)
+            * (jnt_info[#] >> 10) & 0b01 = Joint #'s Error state (BIG err)
+            * (jnt_info[#] >> 11) & 0b01 = Joint #'s Error state (INP err)
+            * (jnt_info[#] >> 12) & 0b01 = Joint #'s Error state (FLT err)
+            * (jnt_info[#] >> 13) & 0b01 = Joint #'s Error state (TMP err)
+            * (jnt_info[#] >> 14) & 0b01 = Joint #'s Error state (PS1 err)
+            * (jnt_info[#] >> 15) & 0b01 = Joint #'s Error state (PS2 err)
+            """
+        @property
+        def jnt_ref(self) -> numpy.typing.NDArray[numpy.float32]:
+            """
+            Reference (desired) joint position. (Unit: deg)
+            
+            0 = Base / 1 = Shoulder / 2 = Elbow / 3 = Wrist1 / 4 = Wrist2 / 5 = Wrist3
+            """
+        @property
+        def jnt_temperature(self) -> numpy.typing.NDArray[numpy.float32]:
+            """
+            Measured temperature of each joint. (unit: celsius)
+            
+            0 = Base / 1 = Shoulder / 2 = Elbow / 3 = Wrist1 / 4 = Wrist2 / 5 = Wrist3
+            """
+        @property
+        def op_stat_collision_occur(self) -> int:
+            """
+            Whether out-collision is detected (0 or 1)
+            """
+        @property
+        def op_stat_ems_flag(self) -> int:
+            """
+            Software (kinematics) emergency stop situation
+            
+            0 = None / 1 = Arm Stretch / 2= Cartesian Limit / 3=Joint Limit / 4=Un-solvable
+            """
+        @property
+        def op_stat_self_collision(self) -> int:
+            """
+            Whether self-collision is detected (0 or 1)
+            """
+        @property
+        def op_stat_soft_estop_occur(self) -> int:
+            """
+            Pause state flag (0 or 1)
+            """
+        @property
+        def op_stat_sos_flag(self) -> int:
+            """
+            Robot Arm device error code during operation.
+            
+            * 0 = None
+            * 1 = Encoder err (PVL)
+            * 2 = CPU err
+            * 3 = Big err
+            * 4 = Input err
+            * 5 = JAM err
+            * 6 = Over current err
+            * 7 = Position bound err
+            * 8 = Mode err
+            * 9 = Match err
+            * 10 = Over current/Low voltage err
+            * 11 = Temperature err
+            * 12 = Speed over err
+            """
+        @property
+        def real_vs_simulation_mode(self) -> int:
+            """
+            Mode of operation: Simulation mode=1 / Real Robot mode=0
+            """
+        @property
+        def reserved_1(self) -> numpy.typing.NDArray[numpy.float32]:
+            """
+            Reserved / Not used
+            """
+        @property
+        def robot_state(self) -> int:
+            """
+            Move (motion) state
+            
+            * 1 = No motion command / Idle
+            * 3 = Executing motion command(s)
+            * 5 = No motion (Move) command + but executing Conveyor or Force control mode
+            * 60+index = Under MovePB/ITPL/Pro command / index is passing waypoint number
+            """
+        @property
+        def safety_board_stat_info(self) -> int:
+            """
+            Data chunk about the control box safety board
+            """
+        @property
+        def task_pc(self) -> int:
+            """
+            Target program counter position during [STEP] function.
+            """
+        @property
+        def task_repeat(self) -> int:
+            """
+            Target program execution number in [PLAY] page.
+            """
+        @property
+        def task_run_id(self) -> int:
+            """
+            Running program counter position.
+            """
+        @property
+        def task_run_num(self) -> int:
+            """
+            Current program execution number in [PLAY] page.
+            """
+        @property
+        def task_run_time(self) -> int:
+            """
+            Time since the program started (unit: second)
+            """
+        @property
+        def task_state(self) -> int:
+            """
+            Basic state of 'Program Execution'
+            
+            * 1 = Program not run / Idle
+            * 3 = Program is running
+            * 2 = Program is running + but ‘Paused’state
+            """
+        @property
+        def tcp_pos(self) -> numpy.typing.NDArray[numpy.float32]:
+            """
+            TCP posture info based on encoder-joint-angles (unit: mm & degree)
+            
+            0 = X / 1 = Y / 2 = Z / 3 = Rx / 4 = Ry / 5 = Rz
+            
+            Warning
+            -------
+            It is being transmitted overwritten based on the current reference.
+            """
+        @property
+        def tcp_ref(self) -> numpy.typing.NDArray[numpy.float32]:
+            """
+            TCP posture info based on reference-joint-angles (unit: mm & degree)
+            
+            0 = X / 1 = Y / 2 = Z / 3 = Rx / 4 = Ry / 5 = Rz
+            """
+        @property
+        def tfb_analog_in(self) -> numpy.typing.NDArray[numpy.float32]:
+            """
+            Robot-Tool-Flange analog input measurement information of each channel (unit: Voltage)
+            """
+        @property
+        def tfb_digital_in(self) -> numpy.typing.NDArray[numpy.int32]:
+            """
+            Robot-Tool-Flange digital input measurement information of each channel (value: 0 or 1)
+            """
+        @property
+        def tfb_digital_out(self) -> numpy.typing.NDArray[numpy.int32]:
+            """
+            Robot-Tool-Flange digital output information of each channel (value: 0 or 1)
+            """
+        @property
+        def tfb_voltage_out(self) -> float:
+            """
+            Robot-Tool-Flage output voltage level (unit: Voltage)
+            """
+        @property
+        def time(self) -> float:
+            """
+            Basic timer. (Unit: sec)
+            """
+    @property
+    def sdata(self) -> SystemState.Data:
+        ...
+
+
