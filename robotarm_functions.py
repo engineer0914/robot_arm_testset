@@ -78,8 +78,27 @@ def get_cb_id(rc, robot):
 
     return
 
+def get_tcp(rc, robot):
+    pos = robot.get_tcp_info(rc)
+    return pos
+
+def get_tfc(rc, robot):
+    pos = robot.get_tfc_info(rc)
+    return pos
+
+def read_joint(rc, robot):
+    joint_angles = []
+    for i in range(6):  # J0 ~ J5
+        _, out = robot.get_system_variable(rc, getattr(rb.SystemVariable, f"SD_J{i}_ANG"))
+        rc = rc.error().throw_if_not_empty()
+        joint_angles.append(out)
+
+    joint_array = np.array(joint_angles, dtype=float)
+    print(f"현재 조인트 각도: {joint_array}\n")
+    return joint_array
+
 # ====== 메인 루틴 ======
-def _main():
+def _main_t():
     # 파일에서 IP 주소 읽기
     robot_ip = read_robot_ip()
     if robot_ip is None:
@@ -115,5 +134,5 @@ def _main():
     robot_move_linear(rc, robot, target_info) # 위에 지정한 지점들로 이동
 
 if __name__ == "__main__":
-    _main()
+    _main_t()
 
