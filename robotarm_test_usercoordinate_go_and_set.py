@@ -1,5 +1,9 @@
 # 시작지점 관절을 txt에서 읽어오고, move j로 움직이고 그위치에 tcp를 수정한뒤 그 위치를 유저 0 기준 좌표로 선정하는 코드입니다.
 
+import numpy as np
+import robotarm_functions as ra_fs
+import rbpodo as rb
+
 # ====== 메인 루틴 ======
 def _main():
     # 파일에서 IP 주소 읽기
@@ -16,11 +20,11 @@ def _main():
     rc = rb.ResponseCollector()
 
     # 모드 및 속도 설정
-    # robot.set_operation_mode(rc, rb.OperationMode.Real)
-    robot.set_operation_mode(rc, rb.OperationMode.Simulation)
+    robot.set_operation_mode(rc, rb.OperationMode.Real)
+    # robot.set_operation_mode(rc, rb.OperationMode.Simulation)
     robot.set_speed_bar(rc, 0.7)
 
-    filename = "point_start.txt"
+    filename = "point_ready.txt"
 
     jointarray = np.loadtxt(filename)
     # print("\n파일에서 불러온 jointarray:")

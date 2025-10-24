@@ -48,7 +48,8 @@ def _main():
         joint_angles.append(out)
 
     # 수평 출력 [0,0,0,0,0,0]
-    print(f"[{','.join(str(angle) for angle in joint_angles)}]")
+    # print(f"[{','.join(str(angle) for angle in joint_angles)}]")
+    print(f"{' '.join(str(angle) for angle in joint_angles)}")
 
 
 if __name__ == "__main__":
