@@ -1,4 +1,4 @@
-# txt파일에 읽고 쓰기 예시입니다.
+# txt파일에 어레이 배열을 읽고 쓰기 예시
 
 import os
 import numpy as np

@@ -30,8 +30,6 @@ def _main():
     # print("\n파일에서 불러온 jointarray:")
     # print(jointarray)
 
-    # ra_fs.robot_move_startpoint(rc, robot) # 시작점 이동
-
     robot.move_j(rc, jointarray, 100, 100)
     if robot.wait_for_move_started(rc, 0.5).is_success():
         robot.wait_for_move_finished(rc)

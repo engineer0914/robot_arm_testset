@@ -1,4 +1,4 @@
-# 조인트를 읽고, txt파일에 씁니다. 나중에 txt파일에서 위치를 불러와서 사용합니다.
+# 현재 조인트를 읽고, txt파일에 씁니다.
 
 import os
 import rbpodo as rb
@@ -29,14 +29,6 @@ def _main():
     print(joint)
 
     robot.set_user_coordinate(rc, 0, joint)
-
-    # robot.set_tcp_info(rc, np.array([0, 0, 0, 0, 0, 0]))
-
-    # ra_fs.robot_move_startpoint(rc, robot) # 시작점 이동
-
-    # pos = ra_fs.get_tcp(rc, robot)
-    # print(pos[1])
-
 
     # 저장할 파일 이름
     filename = "point_start.txt"

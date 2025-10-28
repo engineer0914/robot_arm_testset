@@ -1,3 +1,5 @@
+# 프리드라이브 모드 설정 관련된 함수
+
 def _main():
     try:
         robot = rb.Cobot(ROBOT_IP)

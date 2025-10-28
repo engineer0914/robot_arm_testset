@@ -1,10 +1,7 @@
-# 로봇팔 함수 정리화
-# 직선이동 함수화
-# 컨트롤 박스읽기 함수화
+# 로봇팔 함수 모음집
 
 import rbpodo as rb
 import numpy as np
-import time
 
 # ====== 로봇 IP 읽기 ======
 def read_robot_ip(filename="IP_robotarm.txt"):

@@ -1,3 +1,6 @@
+# 회전 상태 4개중 하나를 보는 함수
+# 아직 추가적인 수정이 필요함
+
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from scipy.spatial.transform import Rotation as R
